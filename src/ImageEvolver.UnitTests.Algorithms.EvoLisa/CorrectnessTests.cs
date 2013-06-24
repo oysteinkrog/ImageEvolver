@@ -49,7 +49,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                 {
                     using (var renderer = evoLisaAlgorithm.CreateRenderer())
                     {
-                        using (var fitnessEvaluator = new FitnessEvaluatorSEBitmap(sourceImage))
+                        using (var fitnessEvaluator = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.SimpleSE))
                         {
                             using (var candidateGenerator = evoLisaAlgorithm.CreateCandidateGenerator())
                             {

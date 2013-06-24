@@ -43,7 +43,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
                 {
                     using (var renderer = evoLisaAlgorithm.CreateRenderer())
                     {
-                        using (var fitnessEvaluator = new FitnessEvaluatorSEBitmap(sourceImage))
+                        using (var fitnessEvaluator = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.PSNR))
                         {
                             using (var candidateGenerator = evoLisaAlgorithm.CreateCandidateGenerator())
                             {

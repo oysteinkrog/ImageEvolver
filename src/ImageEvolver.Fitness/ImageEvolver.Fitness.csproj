@@ -37,7 +37,16 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FitnessEvaluatorSEBitmap.cs" />
+    <Compile Include="CalculateBitmapMAE.cs" />
+    <Compile Include="CalculateBitmapMSE.cs" />
+    <Compile Include="CalculateBitmapNRMSD.cs" />
+    <Compile Include="CalculateBitmapRMSD.cs" />
+    <Compile Include="CalculateBitmapSimpleSE.cs" />
+    <Compile Include="CalculateBitmapAE.cs" />
+    <Compile Include="CalculateBitmapPSNR.cs" />
+    <Compile Include="FitnessEquation.cs" />
+    <Compile Include="FitnessEvaluatorBitmap.cs" />
+    <Compile Include="Pixel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -18,34 +18,63 @@
 
 #endregion
 
-#region
-
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 using ImageEvolver.Core.Fitness;
-
-#endregion
 
 namespace ImageEvolver.Fitness
 {
     /// <summary>
-    ///     Squared-error fitness generator, as used in EvoLisa
     /// </summary>
     /// <remarks>
     ///     Performance optimizations from http://danbystrom.se/2008/12/14/improving-performance/
     /// </remarks>
-    public sealed class FitnessEvaluatorSEBitmap : IDisposable, IFitnessEvaluator<Bitmap>
+    public sealed class FitnessEvaluatorBitmap : IDisposable, IFitnessEvaluator<Bitmap>
     {
+        private readonly FitnessEquation _equationType;
         private readonly Pixel[] _sourceImagePixels;
+        private readonly Func<Pixel[], Bitmap, double> _fitnessEquation;
 
-        public FitnessEvaluatorSEBitmap(Bitmap sourceBitmap)
+        public FitnessEvaluatorBitmap(Bitmap sourceBitmap, FitnessEquation equationType)
         {
+            _equationType = equationType;
             _sourceImagePixels = GenerateSourceColorMatrix(sourceBitmap);
+
+            switch (equationType)
+            {
+                case FitnessEquation.SimpleSE:
+                    _fitnessEquation = CalculateBitmapSimpleSE.EvaluateFitness;
+                    break;
+                case FitnessEquation.MSE:
+                    _fitnessEquation = CalculateBitmapMSE.EvaluateFitness;
+                    break;
+                case FitnessEquation.AE:
+                    _fitnessEquation = CalculateBitmapAE.EvaluateFitness;
+                    break;
+                case FitnessEquation.MAE:
+                    _fitnessEquation = CalculateBitmapMAE.EvaluateFitness;
+                    break;
+                case FitnessEquation.RMSD:
+                    _fitnessEquation = CalculateBitmapRMSD.EvaluateFitness;
+                    break;
+                case FitnessEquation.NRMSD:
+                    _fitnessEquation = CalculateBitmapNRMSD.EvaluateFitness;
+                    break;
+                case FitnessEquation.PSNR:
+                    _fitnessEquation = CalculateBitmapPSNR.EvaluateFitness;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("equationType");
+            }
         }
 
-        ~FitnessEvaluatorSEBitmap()
+        public double EvaluateFitness(Bitmap input)
+        {
+            return _fitnessEquation(_sourceImagePixels, input);
+        }
+
+        ~FitnessEvaluatorBitmap()
         {
             Dispose(false);
         }
@@ -63,42 +92,6 @@ namespace ImageEvolver.Fitness
                 // dispose managed resources
             }
             // free native resources if there are any.
-        }
-
-        public double EvaluateFitness(Bitmap bitmap)
-        {
-            double error = 0;
-
-            BitmapData bd = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            try
-            {
-                unchecked
-                {
-                    unsafe
-                    {
-                        fixed (Pixel* pSourcePixels = _sourceImagePixels)
-                        {
-                            var p1 = (Pixel*) bd.Scan0.ToPointer();
-                            Pixel* p2 = pSourcePixels;
-                            for (int i = _sourceImagePixels.Length; i > 0; i--, p1++, p2++)
-                            {
-                                int r = p1->R - p2->R;
-                                int g = p1->G - p2->G;
-                                int b = p1->B - p2->B;
-
-                                // r^2 + g^2 + b^2
-                                error += r*r + g*g + b*b;
-                            }
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                bitmap.UnlockBits(bd);
-            }
-
-            return error;
         }
 
         private static Pixel[] GenerateSourceColorMatrix(Bitmap sourceImage)
@@ -130,15 +123,6 @@ namespace ImageEvolver.Fitness
             {
                 sourceImage.UnlockBits(bd);
             }
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct Pixel
-        {
-            internal readonly byte B;
-            internal readonly byte G;
-            internal readonly byte R;
-            internal readonly byte A;
         }
     }
 }
