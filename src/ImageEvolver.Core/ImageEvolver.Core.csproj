@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6B38160E-58D5-4EDF-9C68-BE35C36FA315}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ImageEvolver.Core</RootNamespace>
+    <AssemblyName>ImageEvolver.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations">
+      <HintPath>..\packages\JetBrains.Annotations.7.0\lib\net45\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AlgorithmPlatform.cs" />
+    <Compile Include="ApproximationPrimitives.cs" />
+    <Compile Include="ICandidateGenerator.cs" />
+    <Compile Include="Fitness\IFitnessEvaluator.cs" />
+    <Compile Include="IImageCandidateRenderer.cs" />
+    <Compile Include="IAlgorithmDetails.cs" />
+    <Compile Include="IAlgorithmSettings.cs" />
+    <Compile Include="IImageCandidate.cs" />
+    <Compile Include="Mutation\IFeature.cs" />
+    <Compile Include="Mutation\IFeatureMutation.cs" />
+    <Compile Include="Mutation\IFeatureWithSubFeatures.cs" />
+    <Compile Include="Mutation\IImageCandidateMutation.cs" />
+    <Compile Include="Random\BasicPseudoRandomProvider.cs" />
+    <Compile Include="Random\CryptoPseudoRandomProvider.cs" />
+    <Compile Include="Random\CryptoRandom.cs" />
+    <Compile Include="Engines\BasicEngine.cs" />
+    <Compile Include="Engines\IEvolutionEngine.cs" />
+    <Compile Include="IImageApproximationAlgorithm.cs" />
+    <Compile Include="IRandomProvider.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\ISettingsParent.cs" />
+    <Compile Include="Settings\SettingMinMax.cs" />
+    <Compile Include="Settings\SettingMinMaxInt.cs" />
+    <Compile Include="Settings\SettingMinMaxVal.cs" />
+    <Compile Include="Settings\SettingMinMaxValInt.cs" />
+    <Compile Include="Settings\SettingMinMid.cs" />
+    <Compile Include="Settings\SettingMinMidInt.cs" />
+    <Compile Include="Settings\SettingMinMidMax.cs" />
+    <Compile Include="Settings\SettingMinMidMaxInt.cs" />
+    <Compile Include="Settings\SettingVal.cs" />
+    <Compile Include="Settings\SettingValInt.cs" />
+    <Compile Include="Utilities\MathUtils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

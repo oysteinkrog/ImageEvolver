@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1096F6F7-0CBF-4CA8-A797-72AA8BA71E07}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ImageEvolver.Apps.ConsoleTestApp</RootNamespace>
+    <AssemblyName>ImageEvolver.Apps.ConsoleTestApp</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ImageEvolver.Algorithms.EvoLisa\ImageEvolver.Algorithms.EvoLisa.csproj">
+      <Project>{CB6A0103-4EA4-4465-AD9B-AEF7E8314CC4}</Project>
+      <Name>ImageEvolver.Algorithms.EvoLisa</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageEvolver.Core\ImageEvolver.Core.csproj">
+      <Project>{6B38160E-58D5-4EDF-9C68-BE35C36FA315}</Project>
+      <Name>ImageEvolver.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageEvolver.Fitness\ImageEvolver.Fitness.csproj">
+      <Project>{5E6BD2FF-5274-4590-9BB0-9707D5136DE5}</Project>
+      <Name>ImageEvolver.Fitness</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageEvolver.Resources.Images\ImageEvolver.Resources.Images.csproj">
+      <Project>{5A2E0B1D-DCA4-4AC4-AF67-47AD46690C11}</Project>
+      <Name>ImageEvolver.Resources.Images</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

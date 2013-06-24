@@ -1,0 +1,71 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageEvolver.Algorithms.EvoLisa", "ImageEvolver.Algorithms.EvoLisa\ImageEvolver.Algorithms.EvoLisa.csproj", "{CB6A0103-4EA4-4465-AD9B-AEF7E8314CC4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{2C077CE5-082B-4E9B-B9EF-9409912DDED4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{B2BDFE05-1484-44B2-B07F-D42D5744150D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageEvolver.Apps.ConsoleTestApp", "ImageEvolver.Apps.ConsoleTestApp\ImageEvolver.Apps.ConsoleTestApp.csproj", "{1096F6F7-0CBF-4CA8-A797-72AA8BA71E07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageEvolver.Resources.Images", "ImageEvolver.Resources.Images\ImageEvolver.Resources.Images.csproj", "{5A2E0B1D-DCA4-4AC4-AF67-47AD46690C11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageEvolver.UnitTests.Algorithms.EvoLisa", "ImageEvolver.UnitTests.Algorithms.EvoLisa\ImageEvolver.UnitTests.Algorithms.EvoLisa.csproj", "{1E4ADD15-441E-4B33-B649-63A7BE206800}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7827F946-6DFC-4475-B1E3-3518A2B7B7F1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{2BFCC824-CABC-42D1-B285-9743B3608AFD}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageEvolver.Core", "ImageEvolver.Core\ImageEvolver.Core.csproj", "{6B38160E-58D5-4EDF-9C68-BE35C36FA315}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageEvolver.Fitness", "ImageEvolver.Fitness\ImageEvolver.Fitness.csproj", "{5E6BD2FF-5274-4590-9BB0-9707D5136DE5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CB6A0103-4EA4-4465-AD9B-AEF7E8314CC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB6A0103-4EA4-4465-AD9B-AEF7E8314CC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB6A0103-4EA4-4465-AD9B-AEF7E8314CC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB6A0103-4EA4-4465-AD9B-AEF7E8314CC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1096F6F7-0CBF-4CA8-A797-72AA8BA71E07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1096F6F7-0CBF-4CA8-A797-72AA8BA71E07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1096F6F7-0CBF-4CA8-A797-72AA8BA71E07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1096F6F7-0CBF-4CA8-A797-72AA8BA71E07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A2E0B1D-DCA4-4AC4-AF67-47AD46690C11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A2E0B1D-DCA4-4AC4-AF67-47AD46690C11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A2E0B1D-DCA4-4AC4-AF67-47AD46690C11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A2E0B1D-DCA4-4AC4-AF67-47AD46690C11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E4ADD15-441E-4B33-B649-63A7BE206800}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E4ADD15-441E-4B33-B649-63A7BE206800}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E4ADD15-441E-4B33-B649-63A7BE206800}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E4ADD15-441E-4B33-B649-63A7BE206800}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B38160E-58D5-4EDF-9C68-BE35C36FA315}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B38160E-58D5-4EDF-9C68-BE35C36FA315}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B38160E-58D5-4EDF-9C68-BE35C36FA315}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B38160E-58D5-4EDF-9C68-BE35C36FA315}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E6BD2FF-5274-4590-9BB0-9707D5136DE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E6BD2FF-5274-4590-9BB0-9707D5136DE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E6BD2FF-5274-4590-9BB0-9707D5136DE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E6BD2FF-5274-4590-9BB0-9707D5136DE5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CB6A0103-4EA4-4465-AD9B-AEF7E8314CC4} = {2C077CE5-082B-4E9B-B9EF-9409912DDED4}
+		{5A2E0B1D-DCA4-4AC4-AF67-47AD46690C11} = {2C077CE5-082B-4E9B-B9EF-9409912DDED4}
+		{6B38160E-58D5-4EDF-9C68-BE35C36FA315} = {2C077CE5-082B-4E9B-B9EF-9409912DDED4}
+		{5E6BD2FF-5274-4590-9BB0-9707D5136DE5} = {2C077CE5-082B-4E9B-B9EF-9409912DDED4}
+		{1096F6F7-0CBF-4CA8-A797-72AA8BA71E07} = {B2BDFE05-1484-44B2-B07F-D42D5744150D}
+		{1E4ADD15-441E-4B33-B649-63A7BE206800} = {7827F946-6DFC-4475-B1E3-3518A2B7B7F1}
+	EndGlobalSection
+EndGlobal
