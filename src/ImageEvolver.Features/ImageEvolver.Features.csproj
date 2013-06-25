@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ColorFeature.cs" />
+    <Compile Include="CircleFeature.cs" />
     <Compile Include="PointFeature.cs" />
     <Compile Include="PolygonFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
