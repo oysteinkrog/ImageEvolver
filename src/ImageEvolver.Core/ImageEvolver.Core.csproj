@@ -71,6 +71,7 @@
     <Compile Include="Settings\SettingMinMidMaxInt.cs" />
     <Compile Include="Settings\SettingVal.cs" />
     <Compile Include="Settings\SettingValInt.cs" />
+    <Compile Include="Utilities\IRange.cs" />
     <Compile Include="Utilities\MathUtils.cs" />
     <Compile Include="Utilities\Range.cs" />
   </ItemGroup>

@@ -31,7 +31,7 @@ namespace ImageEvolver.Core.Utilities
     /// </remarks>
     /// <typeparam name="T"></typeparam>
     [PublicAPI]
-    public struct Range<T> where T : IComparable<T>
+    public struct Range<T> : IRange<T> where T : IComparable<T>
     {
         public Range(T min, T max) : this()
         {
