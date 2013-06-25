@@ -43,25 +43,25 @@ namespace ImageEvolver.Algorithms.EvoLisa.Mutation
 
             if (_randomProvider.WillMutate(_settings.RedMutationRate.Value))
             {
-                pointFeature.Red = _randomProvider.NextInt(_settings.RedRange.Min, _settings.RedRange.Max);
+                pointFeature.Red = _randomProvider.NextInt(_settings.RedRange);
                 mutated = true;
             }
 
             if (_randomProvider.WillMutate(_settings.GreenMutationRate.Value))
             {
-                pointFeature.Green = _randomProvider.NextInt(_settings.GreenRange.Min, _settings.GreenRange.Max);
+                pointFeature.Green = _randomProvider.NextInt(_settings.GreenRange);
                 mutated = true;
             }
 
             if (_randomProvider.WillMutate(_settings.BlueMutationRate.Value))
             {
-                pointFeature.Blue = _randomProvider.NextInt(_settings.BlueRange.Min, _settings.BlueRange.Max);
+                pointFeature.Blue = _randomProvider.NextInt(_settings.BlueRange);
                 mutated = true;
             }
 
             if (_randomProvider.WillMutate(_settings.AlphaMutationRate.Value))
             {
-                pointFeature.Alpha = _randomProvider.NextInt(_settings.AlphaRange.Min, _settings.AlphaRange.Max);
+                pointFeature.Alpha = _randomProvider.NextInt(_settings.AlphaRange);
                 mutated = true;
             }
 
