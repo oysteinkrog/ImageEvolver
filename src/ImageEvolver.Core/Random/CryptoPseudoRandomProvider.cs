@@ -19,6 +19,7 @@
 #endregion
 
 using System.Diagnostics;
+using ImageEvolver.Core.Utilities;
 using JetBrains.Annotations;
 
 namespace ImageEvolver.Core.Random
@@ -41,10 +42,22 @@ namespace ImageEvolver.Core.Random
             return _random.NextDouble()*(maxValue - minValue) + minValue;
         }
 
+        [PublicAPI]
+        public double NextDouble(Range<double> range)
+        {
+            return NextDouble(range.Min, range.Max);
+        }
+
         public int NextInt(int minValue, int maxValue)
         {
             Debug.Assert(minValue <= maxValue);
             return _random.Next(minValue, maxValue);
+        }
+
+        [PublicAPI]
+        public int NextInt(Range<int> range)
+        {
+            return NextInt(range.Min, range.Max);
         }
     }
 }
