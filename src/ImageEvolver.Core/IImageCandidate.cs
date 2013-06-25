@@ -18,7 +18,13 @@
 
 #endregion
 
+using System.Collections.Generic;
+using ImageEvolver.Core.Mutation;
+
 namespace ImageEvolver.Core
 {
-    public interface IImageCandidate {}
+    public interface IImageCandidate
+    {
+        IEnumerable<IFeature> Features { get; }
+    }
 }

@@ -22,21 +22,22 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using ImageEvolver.Core;
+using ImageEvolver.Core.Mutation;
 using ImageEvolver.Features;
 
-namespace ImageEvolver.Algorithms.EvoLisa.Renderer
+namespace ImageEvolver.Rendering.Bitmap
 {
-    internal sealed class EvoLisaRendererBitmap : IDisposable, IImageCandidateRenderer<EvoLisaImageCandidate, Bitmap>
+    public sealed class GenericFeaturesRendererBitmap : IDisposable, IImageCandidateRenderer<IImageCandidate, System.Drawing.Bitmap>
     {
         private Graphics _g;
 
-        public EvoLisaRendererBitmap(Size size)
+        public GenericFeaturesRendererBitmap(Size size)
         {
-            Value = new Bitmap(size.Width, size.Height);
+            Value = new System.Drawing.Bitmap(size.Width, size.Height);
             _g = Graphics.FromImage(Value);
         }
 
-        ~EvoLisaRendererBitmap()
+        ~GenericFeaturesRendererBitmap()
         {
             Dispose(false);
         }
@@ -67,15 +68,15 @@ namespace ImageEvolver.Algorithms.EvoLisa.Renderer
             // free native resources if there are any.
         }
 
-        public Bitmap Value { get; private set; }
+        public System.Drawing.Bitmap Value { get; private set; }
 
-        public void Render(EvoLisaImageCandidate drawing)
+        public void Render(IImageCandidate candidate)
         {
             _g.Clear(Color.Black);
 
-            foreach (PolygonFeature polygon in drawing.Polygons)
+            foreach (var feature in candidate.Features)
             {
-                Render(polygon, _g);
+                Render(feature, _g);
             }
         }
 
@@ -95,11 +96,24 @@ namespace ImageEvolver.Algorithms.EvoLisa.Renderer
             return gdiPoints;
         }
 
-        private void Render(PolygonFeature polygonFeature, Graphics g)
+        private void Render(IFeature feature, Graphics g)
         {
-            using (Brush brush = GetGDIBrush(polygonFeature.Color))
+            var polygonFeature = feature as PolygonFeature;
+            if (polygonFeature != null)
             {
-                Point[] points = GetGDIPoints(polygonFeature.Points);
+                RenderPolygon(polygonFeature, g);
+            }
+            else
+            {
+                throw new NotSupportedException(string.Format("Rendering feature of type {0} is not supported", feature.GetType()));
+            }
+        }
+
+        private static void RenderPolygon(PolygonFeature feature, Graphics g)
+        {
+            using (Brush brush = GetGDIBrush(feature.Color))
+            {
+                Point[] points = GetGDIPoints(feature.Points);
                 g.FillPolygon(brush, points);
             }
         }

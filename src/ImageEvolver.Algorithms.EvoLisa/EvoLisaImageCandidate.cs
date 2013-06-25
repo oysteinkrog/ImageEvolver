@@ -24,6 +24,7 @@ using System.Linq;
 using ImageEvolver.Algorithms.EvoLisa.Mutation;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;
+using ImageEvolver.Core.Mutation;
 using ImageEvolver.Features;
 
 namespace ImageEvolver.Algorithms.EvoLisa
@@ -40,6 +41,11 @@ namespace ImageEvolver.Algorithms.EvoLisa
         {
             Size = size;
             Polygons = polygons.ToList();
+        }
+
+        public IEnumerable<IFeature> Features
+        {
+            get { return Polygons; }
         }
 
         public int PointCount

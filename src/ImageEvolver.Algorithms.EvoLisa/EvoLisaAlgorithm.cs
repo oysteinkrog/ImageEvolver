@@ -19,9 +19,9 @@
 #endregion
 
 using System.Drawing;
-using ImageEvolver.Algorithms.EvoLisa.Renderer;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;
+using ImageEvolver.Rendering.Bitmap;
 
 namespace ImageEvolver.Algorithms.EvoLisa
 {
@@ -58,7 +58,7 @@ namespace ImageEvolver.Algorithms.EvoLisa
 
         public IImageCandidateRenderer<EvoLisaImageCandidate, Bitmap> CreateRenderer()
         {
-            return new EvoLisaRendererBitmap(_sourceImage.Size);
+            return new GenericFeaturesRendererBitmap(_sourceImage.Size);
         }
     }
 }

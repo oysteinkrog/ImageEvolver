@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CB6A0103-4EA4-4465-AD9B-AEF7E8314CC4}</ProjectGuid>
+    <ProjectGuid>{7EDBE367-DA11-4876-85CF-EFF6BB11D8FF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageEvolver.Algorithms.EvoLisa</RootNamespace>
-    <AssemblyName>ImageEvolver.Algorithms.EvoLisa</AssemblyName>
+    <RootNamespace>ImageEvolver.Rendering.Bitmap</RootNamespace>
+    <AssemblyName>ImageEvolver.Rendering.Bitmap</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -20,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,26 +28,20 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EvoLisaAlgorithm.cs" />
-    <Compile Include="EvoLisaAlgorithmDetails.cs" />
-    <Compile Include="EvoLisaCandidateGenerator.cs" />
-    <Compile Include="EvoLisaImageCandidate.cs" />
-    <Compile Include="Mutation\ColorFeatureMutation.cs" />
-    <Compile Include="Mutation\EvoLisaImageCandidateMutation.cs" />
-    <Compile Include="Mutation\PointFeatureMutation.cs" />
-    <Compile Include="Mutation\PolygonFeatureMutation.cs" />
+    <Compile Include="GenericFeaturesRendererBitmap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings\EvoLisaAlgorithmSettings.cs" />
-    <Compile Include="Settings\SettingsManager.cs" />
-    <Compile Include="Utilities\Tools.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ImageEvolver.Core\ImageEvolver.Core.csproj">
@@ -59,12 +52,7 @@
       <Project>{1FD19629-6857-4B79-9419-A35A244B4EF1}</Project>
       <Name>ImageEvolver.Features</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ImageEvolver.Rendering.Bitmap\ImageEvolver.Rendering.Bitmap.csproj">
-      <Project>{7EDBE367-DA11-4876-85CF-EFF6BB11D8FF}</Project>
-      <Name>ImageEvolver.Rendering.Bitmap</Name>
-    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
