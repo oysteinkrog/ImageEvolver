@@ -18,7 +18,6 @@
 
 #endregion
 
-using ImageEvolver.Core;
 using ImageEvolver.Core.Mutation;
 
 namespace ImageEvolver.Algorithms.EvoLisa.Features
@@ -37,11 +36,6 @@ namespace ImageEvolver.Algorithms.EvoLisa.Features
         public IFeature Clone()
         {
             return new PointFeature(X, Y);
-        }
-
-        public static PointFeature GetRandom(IRandomProvider randomProvider, int maxX, int maxY)
-        {
-            return new PointFeature(randomProvider.NextInt(0, maxX), randomProvider.NextInt(0, maxY));
         }
     }
 }

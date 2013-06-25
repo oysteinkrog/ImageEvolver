@@ -18,14 +18,13 @@
 
 #endregion
 
-using ImageEvolver.Core;
 using ImageEvolver.Core.Mutation;
 
 namespace ImageEvolver.Algorithms.EvoLisa.Features
 {
     internal sealed class ColorFeature : IFeature
     {
-        private ColorFeature(int red, int green, int blue, int alpha)
+        internal ColorFeature(int red, int green, int blue, int alpha)
         {
             Red = red;
             Green = green;
@@ -41,14 +40,6 @@ namespace ImageEvolver.Algorithms.EvoLisa.Features
         public IFeature Clone()
         {
             return new ColorFeature(Red, Green, Blue, Alpha);
-        }
-
-        public static ColorFeature GetRandom(IRandomProvider randomProvider)
-        {
-            return new ColorFeature(randomProvider.NextInt(0, 255),
-                                    randomProvider.NextInt(0, 255),
-                                    randomProvider.NextInt(0, 255),
-                                    randomProvider.NextInt(10, 60));
         }
     }
 }

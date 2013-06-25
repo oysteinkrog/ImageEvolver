@@ -20,16 +20,13 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using ImageEvolver.Algorithms.EvoLisa.Settings;
-using ImageEvolver.Core;
 using ImageEvolver.Core.Mutation;
-using ImageEvolver.Core.Utilities;
 
 namespace ImageEvolver.Algorithms.EvoLisa.Features
 {
     public sealed class PolygonFeature : IFeatureWithSubFeatures
     {
-        private PolygonFeature(IEnumerable<PointFeature> points, ColorFeature color)
+        internal PolygonFeature(IEnumerable<PointFeature> points, ColorFeature color)
         {
             Points = points.ToList();
             Color = color;
@@ -57,26 +54,7 @@ namespace ImageEvolver.Algorithms.EvoLisa.Features
                 }
             }
         }
-
-        public static PolygonFeature GetRandom(IRandomProvider randomProvider, EvoLisaAlgorithmSettings settings, int maxX, int maxY)
-        {
-            var points = new List<PointFeature>();
-
-            //int count = randomProvider.NextInt(3, 3);
-            PointFeature origin = PointFeature.GetRandom(randomProvider, maxX, maxY);
-
-            for (int i = 0; i < settings.PointsPerPolygonRange.Min; i++)
-            {
-                int clampedX = MathUtils.Clamp(origin.X + randomProvider.NextInt(-3, 3), 0, maxX);
-                int clampedY = MathUtils.Clamp(origin.Y + randomProvider.NextInt(-3, 3), 0, maxY);
-                var clampedPoint = new PointFeature(clampedX, clampedY);
-
-                points.Add(clampedPoint);
-            }
-
-            ColorFeature brush = ColorFeature.GetRandom(randomProvider);
-
-            return new PolygonFeature(points, brush);
-        }
     }
+    
+    
 }

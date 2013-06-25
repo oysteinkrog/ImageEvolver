@@ -18,11 +18,13 @@
 
 #endregion
 
+using System.Collections.Generic;
 using ImageEvolver.Algorithms.EvoLisa.Features;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Algorithms.EvoLisa.Utilities;
 using ImageEvolver.Core;
 using ImageEvolver.Core.Mutation;
+using ImageEvolver.Core.Utilities;
 
 namespace ImageEvolver.Algorithms.EvoLisa.Mutation
 {
@@ -63,8 +65,8 @@ namespace ImageEvolver.Algorithms.EvoLisa.Mutation
         {
             if (evoLisaImageCandidate.Polygons.Count < settings.PolygonsRange.Max)
             {
-                PolygonFeature newPolygonFeature = PolygonFeature.GetRandom(randomProvider,
-                                                                            settings,
+                PolygonFeature newPolygonFeature = GetRandomPolygonFeature(randomProvider,
+                                                                            settings.PointsPerPolygonRange.Min,
                                                                             evoLisaImageCandidate.Size.Width,
                                                                             evoLisaImageCandidate.Size.Height);
                 int index = randomProvider.NextInt(0, evoLisaImageCandidate.Polygons.Count);
@@ -99,6 +101,39 @@ namespace ImageEvolver.Algorithms.EvoLisa.Mutation
                 return true;
             }
             return false;
+        }
+
+        private static PolygonFeature GetRandomPolygonFeature(IRandomProvider randomProvider, int numPoints, int maxX, int maxY)
+        {
+            var points = new List<PointFeature>();
+
+            PointFeature origin = GetRandomPointFeature(randomProvider, maxX, maxY);
+
+            for (int i = 0; i < numPoints; i++)
+            {
+                int clampedX = MathUtils.Clamp(origin.X + randomProvider.NextInt(-3, 3), 0, maxX);
+                int clampedY = MathUtils.Clamp(origin.Y + randomProvider.NextInt(-3, 3), 0, maxY);
+                var clampedPoint = new PointFeature(clampedX, clampedY);
+
+                points.Add(clampedPoint);
+            }
+
+            ColorFeature brush = GetRandomColorFeature(randomProvider);
+
+            return new PolygonFeature(points, brush);
+        }
+
+        private static ColorFeature GetRandomColorFeature(IRandomProvider randomProvider)
+        {
+            return new ColorFeature(randomProvider.NextInt(0, 255),
+                                    randomProvider.NextInt(0, 255),
+                                    randomProvider.NextInt(0, 255),
+                                    randomProvider.NextInt(10, 60));
+        }
+
+        private static PointFeature GetRandomPointFeature(IRandomProvider randomProvider, int maxX, int maxY)
+        {
+            return new PointFeature(randomProvider.NextInt(0, maxX), randomProvider.NextInt(0, maxY));
         }
     }
 }
