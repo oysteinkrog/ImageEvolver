@@ -50,6 +50,7 @@
     <Compile Include="IImageCandidate.cs" />
     <Compile Include="Mutation\IFeature.cs" />
     <Compile Include="Mutation\IFeatureMutation.cs" />
+    <Compile Include="Mutation\IFeatures.cs" />
     <Compile Include="Mutation\IFeatureWithSubFeatures.cs" />
     <Compile Include="Mutation\IImageCandidateMutation.cs" />
     <Compile Include="Random\BasicPseudoRandomProvider.cs" />
