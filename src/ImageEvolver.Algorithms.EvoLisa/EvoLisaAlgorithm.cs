@@ -19,7 +19,6 @@
 #endregion
 
 using System.Drawing;
-using ImageEvolver.Algorithms.EvoLisa.Features;
 using ImageEvolver.Algorithms.EvoLisa.Renderer;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;

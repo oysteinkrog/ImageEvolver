@@ -21,7 +21,6 @@
 using System;
 using System.Drawing;
 using ImageEvolver.Algorithms.EvoLisa;
-using ImageEvolver.Algorithms.EvoLisa.Features;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core.Engines;
 using ImageEvolver.Core.Random;

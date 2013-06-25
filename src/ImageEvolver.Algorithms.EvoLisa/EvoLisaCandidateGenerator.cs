@@ -20,7 +20,6 @@
 
 using System;
 using System.Drawing;
-using ImageEvolver.Algorithms.EvoLisa.Features;
 using ImageEvolver.Algorithms.EvoLisa.Mutation;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;

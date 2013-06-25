@@ -1,7 +1,7 @@
-﻿#region Copyright
+#region Copyright
 
 //     ImageEvolver
-//     Copyright (C) 2013-2013 Øystein Krog
+//     Copyright (C) 2013-2013 �ystein Krog
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU Affero General Public License as
@@ -26,7 +26,7 @@ using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;
 using ImageEvolver.Features;
 
-namespace ImageEvolver.Algorithms.EvoLisa.Features
+namespace ImageEvolver.Algorithms.EvoLisa
 {
     public sealed class EvoLisaImageCandidate : IImageCandidate
     {

@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using ImageEvolver.Algorithms.EvoLisa.Features;
 using ImageEvolver.Core;
 using ImageEvolver.Features;
 

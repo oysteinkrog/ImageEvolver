@@ -18,7 +18,6 @@
 
 #endregion
 
-using ImageEvolver.Algorithms.EvoLisa.Features;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Algorithms.EvoLisa.Utilities;
 using ImageEvolver.Core;

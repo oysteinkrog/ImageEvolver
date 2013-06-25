@@ -40,7 +40,7 @@
     <Compile Include="EvoLisaAlgorithm.cs" />
     <Compile Include="EvoLisaAlgorithmDetails.cs" />
     <Compile Include="EvoLisaCandidateGenerator.cs" />
-    <Compile Include="Features\EvoLisaImageCandidate.cs" />
+    <Compile Include="Candidate\EvoLisaImageCandidate.cs" />
     <Compile Include="Mutation\ColorFeatureMutation.cs" />
     <Compile Include="Mutation\EvoLisaImageCandidateMutation.cs" />
     <Compile Include="Mutation\PointFeatureMutation.cs" />
