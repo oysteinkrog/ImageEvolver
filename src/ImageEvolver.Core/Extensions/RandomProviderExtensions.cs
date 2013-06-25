@@ -1,5 +1,4 @@
 ﻿#region Copyright
-
 //     ImageEvolver
 //     Copyright (C) 2013-2013 Øystein Krog
 // 
@@ -15,40 +14,25 @@
 // 
 //     You should have received a copy of the GNU Affero General Public License
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 #endregion
 
-using System.Diagnostics;
 using ImageEvolver.Core.Utilities;
 using JetBrains.Annotations;
 
-namespace ImageEvolver.Core.Random
+namespace ImageEvolver.Core.Extensions
 {
-    [PublicAPI]
-    public sealed class CryptoPseudoRandomProvider : IRandomProvider
+    public static class RandomProviderExtensions
     {
-        private readonly CryptoRandom _random;
-
         [PublicAPI]
-        public CryptoPseudoRandomProvider()
+        public static double NextDouble(this IRandomProvider randomProvider, IRange<double> range)
         {
-            _random = new CryptoRandom();
-        }
-
-        public void Dispose() {}
-
-        [PublicAPI]
-        public double NextDouble(double minValue, double maxValue)
-        {
-            Debug.Assert(minValue <= maxValue);
-            return _random.NextDouble()*(maxValue - minValue) + minValue;
+            return randomProvider.NextDouble(range.Min, range.Max);
         }
 
         [PublicAPI]
-        public int NextInt(int minValue, int maxValue)
+        public static int NextInt(this IRandomProvider randomProvider, IRange<int> range)
         {
-            Debug.Assert(minValue <= maxValue);
-            return _random.Next(minValue, maxValue);
+            return randomProvider.NextInt(range.Min, range.Max);
         }
     }
 }

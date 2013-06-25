@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="AlgorithmPlatform.cs" />
     <Compile Include="ApproximationPrimitives.cs" />
+    <Compile Include="Extensions\RandomProviderExtensions.cs" />
     <Compile Include="ICandidateGenerator.cs" />
     <Compile Include="Fitness\IFitnessEvaluator.cs" />
     <Compile Include="IImageCandidateRenderer.cs" />

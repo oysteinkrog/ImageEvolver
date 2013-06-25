@@ -21,6 +21,7 @@
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Algorithms.EvoLisa.Utilities;
 using ImageEvolver.Core;
+using ImageEvolver.Core.Extensions;
 using ImageEvolver.Core.Mutation;
 using ImageEvolver.Features;
 

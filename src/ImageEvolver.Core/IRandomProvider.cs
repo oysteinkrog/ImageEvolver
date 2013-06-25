@@ -19,7 +19,6 @@
 #endregion
 
 using System;
-using ImageEvolver.Core.Utilities;
 using JetBrains.Annotations;
 
 namespace ImageEvolver.Core
@@ -30,12 +29,6 @@ namespace ImageEvolver.Core
         double NextDouble(double minValue, double maxValue);
 
         [PublicAPI]
-        double NextDouble(IRange<double> range);
-
-        [PublicAPI]
         int NextInt(int minValue, int maxValue);
-
-        [PublicAPI]
-        int NextInt(IRange<int> range);
     }
 }

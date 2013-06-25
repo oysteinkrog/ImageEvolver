@@ -54,22 +54,10 @@ namespace ImageEvolver.Core.Random
         }
 
         [PublicAPI]
-        public double NextDouble(IRange<double> range)
-        {
-            return NextDouble(range.Min, range.Max);
-        }
-
-        [PublicAPI]
         public int NextInt(int minValue, int maxValue)
         {
             Debug.Assert(minValue <= maxValue);
             return _random.Next(minValue, maxValue);
-        }
-
-        [PublicAPI]
-        public int NextInt(IRange<int> range)
-        {
-            return NextInt(range.Min, range.Max);
         }
     }
 }
