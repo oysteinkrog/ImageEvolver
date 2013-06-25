@@ -1,7 +1,7 @@
-﻿#region Copyright
+#region Copyright
 
 //     ImageEvolver
-//     Copyright (C) 2013-2013 Øystein Krog
+//     Copyright (C) 2013-2013 �ystein Krog
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU Affero General Public License as
@@ -22,18 +22,18 @@ using System.Collections.Generic;
 using System.Linq;
 using ImageEvolver.Core.Mutation;
 
-namespace ImageEvolver.Algorithms.EvoLisa.Features
+namespace ImageEvolver.Features
 {
     public sealed class PolygonFeature : IFeatureWithSubFeatures
     {
-        internal PolygonFeature(IEnumerable<PointFeature> points, ColorFeature color)
+        public PolygonFeature(IEnumerable<PointFeature> points, ColorFeature color)
         {
             Points = points.ToList();
             Color = color;
         }
 
-        internal ColorFeature Color { get; private set; }
-        internal List<PointFeature> Points { get; private set; }
+        public ColorFeature Color { get; private set; }
+        public List<PointFeature> Points { get; private set; }
 
         public IFeature Clone()
         {

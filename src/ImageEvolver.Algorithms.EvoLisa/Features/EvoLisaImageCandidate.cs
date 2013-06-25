@@ -24,6 +24,7 @@ using System.Linq;
 using ImageEvolver.Algorithms.EvoLisa.Mutation;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;
+using ImageEvolver.Features;
 
 namespace ImageEvolver.Algorithms.EvoLisa.Features
 {

@@ -25,6 +25,7 @@ using ImageEvolver.Algorithms.EvoLisa.Utilities;
 using ImageEvolver.Core;
 using ImageEvolver.Core.Mutation;
 using ImageEvolver.Core.Utilities;
+using ImageEvolver.Features;
 
 namespace ImageEvolver.Algorithms.EvoLisa.Mutation
 {
@@ -66,9 +67,9 @@ namespace ImageEvolver.Algorithms.EvoLisa.Mutation
             if (evoLisaImageCandidate.Polygons.Count < settings.PolygonsRange.Max)
             {
                 PolygonFeature newPolygonFeature = GetRandomPolygonFeature(randomProvider,
-                                                                            settings.PointsPerPolygonRange.Min,
-                                                                            evoLisaImageCandidate.Size.Width,
-                                                                            evoLisaImageCandidate.Size.Height);
+                                                                           settings.PointsPerPolygonRange.Min,
+                                                                           evoLisaImageCandidate.Size.Width,
+                                                                           evoLisaImageCandidate.Size.Height);
                 int index = randomProvider.NextInt(0, evoLisaImageCandidate.Polygons.Count);
 
                 evoLisaImageCandidate.Polygons.Insert(index, newPolygonFeature);
@@ -103,6 +104,19 @@ namespace ImageEvolver.Algorithms.EvoLisa.Mutation
             return false;
         }
 
+        private static ColorFeature GetRandomColorFeature(IRandomProvider randomProvider)
+        {
+            return new ColorFeature(randomProvider.NextInt(0, 255),
+                                    randomProvider.NextInt(0, 255),
+                                    randomProvider.NextInt(0, 255),
+                                    randomProvider.NextInt(10, 60));
+        }
+
+        private static PointFeature GetRandomPointFeature(IRandomProvider randomProvider, int maxX, int maxY)
+        {
+            return new PointFeature(randomProvider.NextInt(0, maxX), randomProvider.NextInt(0, maxY));
+        }
+
         private static PolygonFeature GetRandomPolygonFeature(IRandomProvider randomProvider, int numPoints, int maxX, int maxY)
         {
             var points = new List<PointFeature>();
@@ -121,19 +135,6 @@ namespace ImageEvolver.Algorithms.EvoLisa.Mutation
             ColorFeature brush = GetRandomColorFeature(randomProvider);
 
             return new PolygonFeature(points, brush);
-        }
-
-        private static ColorFeature GetRandomColorFeature(IRandomProvider randomProvider)
-        {
-            return new ColorFeature(randomProvider.NextInt(0, 255),
-                                    randomProvider.NextInt(0, 255),
-                                    randomProvider.NextInt(0, 255),
-                                    randomProvider.NextInt(10, 60));
-        }
-
-        private static PointFeature GetRandomPointFeature(IRandomProvider randomProvider, int maxX, int maxY)
-        {
-            return new PointFeature(randomProvider.NextInt(0, maxX), randomProvider.NextInt(0, maxY));
         }
     }
 }

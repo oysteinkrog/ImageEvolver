@@ -20,7 +20,7 @@
 
 using ImageEvolver.Core.Mutation;
 
-namespace ImageEvolver.Algorithms.EvoLisa.Features
+namespace ImageEvolver.Features
 {
     public class PointFeature : IFeature
     {
@@ -30,8 +30,8 @@ namespace ImageEvolver.Algorithms.EvoLisa.Features
             Y = y;
         }
 
-        public int X { get; internal set; }
-        public int Y { get; internal set; }
+        public int X { get; set; }
+        public int Y { get; set; }
 
         public IFeature Clone()
         {

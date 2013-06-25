@@ -20,11 +20,11 @@
 
 using ImageEvolver.Core.Mutation;
 
-namespace ImageEvolver.Algorithms.EvoLisa.Features
+namespace ImageEvolver.Features
 {
-    internal sealed class ColorFeature : IFeature
+    public sealed class ColorFeature : IFeature
     {
-        internal ColorFeature(int red, int green, int blue, int alpha)
+        public ColorFeature(int red, int green, int blue, int alpha)
         {
             Red = red;
             Green = green;
@@ -32,10 +32,10 @@ namespace ImageEvolver.Algorithms.EvoLisa.Features
             Alpha = alpha;
         }
 
-        public int Alpha { get; internal set; }
-        public int Blue { get; internal set; }
-        public int Green { get; internal set; }
-        public int Red { get; internal set; }
+        public int Alpha { get; set; }
+        public int Blue { get; set; }
+        public int Green { get; set; }
+        public int Red { get; set; }
 
         public IFeature Clone()
         {
