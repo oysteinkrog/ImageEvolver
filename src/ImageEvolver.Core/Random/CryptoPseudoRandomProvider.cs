@@ -29,6 +29,7 @@ namespace ImageEvolver.Core.Random
     {
         private readonly CryptoRandom _random;
 
+        [PublicAPI]
         public CryptoPseudoRandomProvider()
         {
             _random = new CryptoRandom();
@@ -36,6 +37,7 @@ namespace ImageEvolver.Core.Random
 
         public void Dispose() {}
 
+        [PublicAPI]
         public double NextDouble(double minValue, double maxValue)
         {
             Debug.Assert(minValue <= maxValue);
@@ -48,6 +50,7 @@ namespace ImageEvolver.Core.Random
             return NextDouble(range.Min, range.Max);
         }
 
+        [PublicAPI]
         public int NextInt(int minValue, int maxValue)
         {
             Debug.Assert(minValue <= maxValue);
