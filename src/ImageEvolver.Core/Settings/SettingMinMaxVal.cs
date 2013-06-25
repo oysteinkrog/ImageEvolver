@@ -18,9 +18,11 @@
 
 #endregion
 
+using System;
+
 namespace ImageEvolver.Core.Settings
 {
-    public abstract class SettingMinMaxVal<T> : SettingMinMax<T>
+    public abstract class SettingMinMaxVal<T> : SettingMinMax<T> where T : IComparable<T>
     {
         public abstract T Value { get; protected internal set; }
     }

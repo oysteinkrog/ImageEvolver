@@ -18,9 +18,11 @@
 
 #endregion
 
+using System;
+
 namespace ImageEvolver.Core.Settings
 {
-    public abstract class SettingMinMidMax<T> : SettingMinMax<T>
+    public abstract class SettingMinMidMax<T> : SettingMinMax<T> where T : IComparable<T>
     {
         public abstract T Mid { get; protected internal set; }
     }
