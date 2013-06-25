@@ -30,12 +30,12 @@ namespace ImageEvolver.Core
         double NextDouble(double minValue, double maxValue);
 
         [PublicAPI]
-        double NextDouble(Range<double> range);
+        double NextDouble(IRange<double> range);
 
         [PublicAPI]
         int NextInt(int minValue, int maxValue);
 
         [PublicAPI]
-        int NextInt(Range<int> range);
+        int NextInt(IRange<int> range);
     }
 }

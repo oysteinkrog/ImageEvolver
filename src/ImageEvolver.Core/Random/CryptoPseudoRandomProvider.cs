@@ -45,7 +45,7 @@ namespace ImageEvolver.Core.Random
         }
 
         [PublicAPI]
-        public double NextDouble(Range<double> range)
+        public double NextDouble(IRange<double> range)
         {
             return NextDouble(range.Min, range.Max);
         }
@@ -58,7 +58,7 @@ namespace ImageEvolver.Core.Random
         }
 
         [PublicAPI]
-        public int NextInt(Range<int> range)
+        public int NextInt(IRange<int> range)
         {
             return NextInt(range.Min, range.Max);
         }
