@@ -43,11 +43,6 @@ namespace ImageEvolver.Algorithms.EvoLisa
             Polygons = polygons.ToList();
         }
 
-        public IEnumerable<IFeature> Features
-        {
-            get { return Polygons; }
-        }
-
         public int PointCount
         {
             get { return Polygons.Sum(polygon => polygon.Points.Count); }
@@ -55,12 +50,17 @@ namespace ImageEvolver.Algorithms.EvoLisa
 
         public List<PolygonFeature> Polygons { get; private set; }
 
+        public IEnumerable<IFeature> Features
+        {
+            get { return Polygons; }
+        }
+
         public Size Size { get; private set; }
 
         public EvoLisaImageCandidate Clone()
         {
-            var clonedPolygons = Polygons.Select(polygon => polygon.Clone())
-                                         .Cast<PolygonFeature>();
+            IEnumerable<PolygonFeature> clonedPolygons = Polygons.Select(polygon => polygon.Clone())
+                                                                 .Cast<PolygonFeature>();
             return new EvoLisaImageCandidate(Size, clonedPolygons);
         }
 
