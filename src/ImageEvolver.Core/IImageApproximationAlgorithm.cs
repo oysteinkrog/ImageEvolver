@@ -35,8 +35,5 @@ namespace ImageEvolver.Core
 
         [PublicAPI]
         ICandidateGenerator<TCandidate> CreateCandidateGenerator();
-
-        [PublicAPI]
-        IImageCandidateRenderer<TCandidate, Bitmap> CreateRenderer();
     }
 }

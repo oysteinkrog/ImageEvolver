@@ -21,7 +21,6 @@
 using System.Drawing;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;
-using ImageEvolver.Rendering.Bitmap;
 
 namespace ImageEvolver.Algorithms.EvoLisa
 {
@@ -56,9 +55,5 @@ namespace ImageEvolver.Algorithms.EvoLisa
             return new EvoLisaCandidateGenerator(_sourceImage, _randomProvider, (EvoLisaAlgorithmSettings) _settings);
         }
 
-        public IImageCandidateRenderer<EvoLisaImageCandidate, Bitmap> CreateRenderer()
-        {
-            return new GenericFeaturesRendererBitmap(_sourceImage.Size);
-        }
     }
 }

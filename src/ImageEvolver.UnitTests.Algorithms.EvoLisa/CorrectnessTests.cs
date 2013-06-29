@@ -24,6 +24,7 @@ using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core.Engines;
 using ImageEvolver.Core.Random;
 using ImageEvolver.Fitness;
+using ImageEvolver.Rendering.Bitmap;
 using ImageEvolver.Resources.Images;
 using NUnit.Framework;
 
@@ -46,7 +47,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
             {
                 using (var evoLisaAlgorithm = new EvoLisaAlgorithm(sourceImage, evoLisaAlgorithmSettings, basicPseudoRandomProvider))
                 {
-                    using (var renderer = evoLisaAlgorithm.CreateRenderer())
+                    using (var renderer = new GenericFeaturesRendererBitmap(sourceImage.Size))
                     {
                         using (var fitnessEvaluator = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.SimpleSE))
                         {
