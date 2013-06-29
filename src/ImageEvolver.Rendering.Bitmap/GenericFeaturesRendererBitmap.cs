@@ -29,12 +29,13 @@ namespace ImageEvolver.Rendering.Bitmap
 {
     public sealed class GenericFeaturesRendererBitmap : IDisposable, IImageCandidateRenderer<IImageCandidate, System.Drawing.Bitmap>
     {
+        public System.Drawing.Bitmap _bitmap;
         private Graphics _g;
 
         public GenericFeaturesRendererBitmap(Size size)
         {
-            Value = new System.Drawing.Bitmap(size.Width, size.Height);
-            _g = Graphics.FromImage(Value);
+            _bitmap = new System.Drawing.Bitmap(size.Width, size.Height);
+            _g = Graphics.FromImage(_bitmap);
         }
 
         ~GenericFeaturesRendererBitmap()
@@ -53,10 +54,10 @@ namespace ImageEvolver.Rendering.Bitmap
             if (disposing)
             {
                 // free managed resources
-                if (Value != null)
+                if (_bitmap != null)
                 {
-                    Value.Dispose();
-                    Value = null;
+                    _bitmap.Dispose();
+                    _bitmap = null;
                 }
 
                 if (_g != null)
@@ -68,16 +69,15 @@ namespace ImageEvolver.Rendering.Bitmap
             // free native resources if there are any.
         }
 
-        public System.Drawing.Bitmap Value { get; private set; }
-
-        public void Render(IImageCandidate candidate)
+        public System.Drawing.Bitmap Render(IImageCandidate candidate)
         {
             _g.Clear(Color.Black);
 
-            foreach (var feature in candidate.Features)
+            foreach (IFeature feature in candidate.Features)
             {
                 Render(feature, _g);
             }
+            return _bitmap;
         }
 
         private static Brush GetGDIBrush(ColorFeature b)

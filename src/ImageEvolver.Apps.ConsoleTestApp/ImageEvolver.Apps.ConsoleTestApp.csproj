@@ -56,6 +56,10 @@
       <Project>{5E6BD2FF-5274-4590-9BB0-9707D5136DE5}</Project>
       <Name>ImageEvolver.Fitness</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ImageEvolver.Rendering.Bitmap\ImageEvolver.Rendering.Bitmap.csproj">
+      <Project>{7EDBE367-DA11-4876-85CF-EFF6BB11D8FF}</Project>
+      <Name>ImageEvolver.Rendering.Bitmap</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ImageEvolver.Resources.Images\ImageEvolver.Resources.Images.csproj">
       <Project>{5A2E0B1D-DCA4-4AC4-AF67-47AD46690C11}</Project>
       <Name>ImageEvolver.Resources.Images</Name>

@@ -61,8 +61,8 @@ namespace ImageEvolver.Apps.ConsoleTestApp
                                             // print every 100 better-fitness selection
                                             if (evolutionEngine.Selected%100 == 0)
                                             {
-                                                renderer.Render(evolutionEngine.CurrentBestCandidate);
-                                                renderer.Value.Save(string.Format("MonaLisa-test-{0}-{1}.jpg",
+                                                var newRender = renderer.Render(evolutionEngine.CurrentBestCandidate);
+                                                newRender.Save(string.Format("MonaLisa-test-{0}-{1}.jpg",
                                                                                   evolutionEngine.Selected,
                                                                                   evolutionEngine.Generation));
                                             }

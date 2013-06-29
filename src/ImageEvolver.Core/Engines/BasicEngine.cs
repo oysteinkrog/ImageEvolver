@@ -100,15 +100,14 @@ namespace ImageEvolver.Core.Engines
             {
                 // generate a new candidate from the single parent (no crossover/recombination)
                 bool mutated;
-                var newCandidate = _candidateGenerator.GenerateCandidate(CurrentBestCandidate, out mutated);
+                TCandidate newCandidate = _candidateGenerator.GenerateCandidate(CurrentBestCandidate, out mutated);
 
                 Candidates++;
                 if (mutated)
                 {
                     Generation++;
 
-                    _renderer.Render(newCandidate);
-                    var newRender = _renderer.Value;
+                    var newRender = _renderer.Render(newCandidate);
 
                     // evaluate fitness of the new candidate
                     double newFitness = _fitnessEvaluator.EvaluateFitness(newRender);
