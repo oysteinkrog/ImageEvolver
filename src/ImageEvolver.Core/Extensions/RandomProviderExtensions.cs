@@ -16,6 +16,7 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endregion
 
+using System.Drawing;
 using ImageEvolver.Core.Utilities;
 using JetBrains.Annotations;
 
@@ -34,5 +35,36 @@ namespace ImageEvolver.Core.Extensions
         {
             return randomProvider.NextInt(range.Min, range.Max);
         }
+
+        [PublicAPI]
+        public static Point NextPoint(this IRandomProvider randomProvider, IRange<int> rangeX, IRange<int> rangY)
+        {
+            return new Point(randomProvider.NextInt(rangeX), randomProvider.NextInt(rangY));
+        }
+
+        [PublicAPI]
+        public static Point NextPoint(this IRandomProvider randomProvider, Size max)
+        {
+            return new Point(randomProvider.NextInt(0, max.Width), randomProvider.NextInt(0, max.Height));
+        }
+
+        [PublicAPI]
+        public static Size NextSize(this IRandomProvider randomProvider, Point max)
+        {
+            return new Size(randomProvider.NextInt(0, max.X), randomProvider.NextInt(0, max.Y));
+        }
+
+        [PublicAPI]
+        public static Size NextSize(this IRandomProvider randomProvider, Size max)
+        {
+            return new Size(randomProvider.NextInt(0, max.Width), randomProvider.NextInt(0, max.Height));
+        }
+
+        [PublicAPI]
+        public static Size NextSize(this IRandomProvider randomProvider, Point min, Point max)
+        {
+            return new Size(randomProvider.NextInt(min.X, max.X), randomProvider.NextInt(min.Y, max.Y));
+        }
+
     }
 }
