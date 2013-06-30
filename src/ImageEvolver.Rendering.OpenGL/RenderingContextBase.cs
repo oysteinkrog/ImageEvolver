@@ -64,6 +64,11 @@ namespace ImageEvolver.Rendering.OpenGL
         {
             try
             {
+                if (_disposed)
+                {
+                    return;
+                }
+
                 if (disposing)
                 {
                     // dispose managed resources
