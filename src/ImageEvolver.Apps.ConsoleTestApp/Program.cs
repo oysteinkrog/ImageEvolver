@@ -26,6 +26,7 @@ using ImageEvolver.Core.Engines;
 using ImageEvolver.Core.Random;
 using ImageEvolver.Fitness;
 using ImageEvolver.Rendering.Bitmap;
+using ImageEvolver.Rendering.OpenGL;
 using ImageEvolver.Resources.Images;
 
 namespace ImageEvolver.Apps.ConsoleTestApp
@@ -41,9 +42,10 @@ namespace ImageEvolver.Apps.ConsoleTestApp
             {
                 using (var evoLisaAlgorithm = new EvoLisaAlgorithm(sourceImage, evoLisaAlgorithmSettings, basicPseudoRandomProvider))
                 {
-                    using (var renderer = new GenericFeaturesRendererBitmap(sourceImage.Size))
+//                    using (var renderer = new GenericFeaturesRendererBitmap(sourceImage.Size))
+                    using (var renderer = new GenericFeaturesRendererOpenGL(sourceImage.Size))
                     {
-                        using (var fitnessEvaluator = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.PSNR))
+                        using (var fitnessEvaluator = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.AE))
                         {
                             using (var candidateGenerator = evoLisaAlgorithm.CreateCandidateGenerator())
                             {
@@ -61,10 +63,8 @@ namespace ImageEvolver.Apps.ConsoleTestApp
                                             // print every 100 better-fitness selection
                                             if (evolutionEngine.Selected%100 == 0)
                                             {
-                                                var newRender = renderer.Render(evolutionEngine.CurrentBestCandidate);
-                                                newRender.Save(string.Format("MonaLisa-test-{0}-{1}.jpg",
-                                                                                  evolutionEngine.Selected,
-                                                                                  evolutionEngine.Generation));
+                                                var bitmap = renderer.Render(evolutionEngine.CurrentBestCandidate);
+                                                bitmap.Save(string.Format("MonaLisa-test-{0}-{1}.jpg", evolutionEngine.Selected, evolutionEngine.Generation));
                                             }
                                         }
                                     }

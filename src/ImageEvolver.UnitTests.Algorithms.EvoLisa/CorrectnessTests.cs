@@ -26,6 +26,7 @@ using ImageEvolver.Core.Engines;
 using ImageEvolver.Core.Random;
 using ImageEvolver.Fitness;
 using ImageEvolver.Rendering.Bitmap;
+using ImageEvolver.Rendering.OpenGL;
 using ImageEvolver.Resources.Images;
 using NUnit.Framework;
 
@@ -141,6 +142,19 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
         {
             var sourceImage = Images.MonaLisa;
             using (var renderer = new GenericFeaturesRendererBitmap(sourceImage.Size))
+            {
+                using (var basicPseudoRandomProvider = new BasicPseudoRandomProvider(0))
+                {
+                    TestEvoLisaWithRenderer(renderer, sourceImage, basicPseudoRandomProvider);
+                }
+            }
+        }
+
+        [Test]
+        public void TestOpenGLRenderer()
+        {
+            var sourceImage = Images.MonaLisa;
+            using (var renderer = new GenericFeaturesRendererOpenGL(sourceImage.Size))
             {
                 using (var basicPseudoRandomProvider = new BasicPseudoRandomProvider(0))
                 {
