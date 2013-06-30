@@ -154,14 +154,13 @@ namespace ImageEvolver.Rendering.OpenGL
             var indexBuffer = new IndexBuffer(BufferUsageHint.StaticDraw, indicesArray);
 
             // Create the vertex array which encapsulates the state changes needed to enable the vertex buffers
-            var vertexArray = new VertexArray(verticesBuffer);
+            var vertexArray = new VertexArray(indexBuffer, verticesBuffer);
 
             _technique.UseTexture = false;
             _technique.DrawColor = new Color4(feature.Color.Red/255f, feature.Color.Green/255f, feature.Color.Blue/255f, feature.Color.Alpha/255f);
 
             // Draw the data
             _glManager.BindVertexArray(vertexArray);
-            _glManager.BindIndexBuffer(indexBuffer);
             _glManager.DrawElementsIndexed(BeginMode.Triangles, indicesArray.Length, 0);
 
             verticesBuffer.ClearResources();
