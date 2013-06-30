@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageEvolver.Apps.OpenGLTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Koeky3D", "lib\Koeky3D\Koeky3D.csproj", "{01A950ED-F882-407A-90A8-A93D21B43289}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageEvolver.UnitTests.Renderers", "ImageEvolver.UnitTests.Renderers\ImageEvolver.UnitTests.Renderers.csproj", "{5C45111C-6513-4C2C-BD00-446E9F1D7CDD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{01A950ED-F882-407A-90A8-A93D21B43289}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01A950ED-F882-407A-90A8-A93D21B43289}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01A950ED-F882-407A-90A8-A93D21B43289}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C45111C-6513-4C2C-BD00-446E9F1D7CDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C45111C-6513-4C2C-BD00-446E9F1D7CDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C45111C-6513-4C2C-BD00-446E9F1D7CDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C45111C-6513-4C2C-BD00-446E9F1D7CDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,5 +110,6 @@ Global
 		{1096F6F7-0CBF-4CA8-A797-72AA8BA71E07} = {B2BDFE05-1484-44B2-B07F-D42D5744150D}
 		{A8C3D1A1-2D4B-4529-8F65-B71AF973FD84} = {B2BDFE05-1484-44B2-B07F-D42D5744150D}
 		{1E4ADD15-441E-4B33-B649-63A7BE206800} = {7827F946-6DFC-4475-B1E3-3518A2B7B7F1}
+		{5C45111C-6513-4C2C-BD00-446E9F1D7CDD} = {7827F946-6DFC-4475-B1E3-3518A2B7B7F1}
 	EndGlobalSection
 EndGlobal
