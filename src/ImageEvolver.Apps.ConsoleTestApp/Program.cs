@@ -55,7 +55,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
                                     {
                                         if (evolutionEngine.Step())
                                         {
-                                            Console.WriteLine("{0} {1} {2}",
+                                            Console.WriteLine("{0} {1} {2:0.000}",
                                                               evolutionEngine.Selected,
                                                               evolutionEngine.Generation,
                                                               evolutionEngine.CurrentBestFitness);
