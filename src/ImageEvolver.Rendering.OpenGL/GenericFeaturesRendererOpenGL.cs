@@ -20,7 +20,6 @@
 
 using System;
 using System.Drawing;
-using System.Threading.Tasks;
 using ImageEvolver.Core;
 using Config = OpenTK.Configuration;
 
@@ -29,8 +28,6 @@ namespace ImageEvolver.Rendering.OpenGL
     public sealed class GenericFeaturesRendererOpenGL : IDisposable, IImageCandidateRenderer<IImageCandidate, Bitmap>
     {
         private OpenGlRenderer _glRenderer;
-        private TaskFactory _glTaskFactory;
-        private SingleThreadTaskScheduler _glTaskScheduler;
 
         public GenericFeaturesRendererOpenGL(Size size)
         {
