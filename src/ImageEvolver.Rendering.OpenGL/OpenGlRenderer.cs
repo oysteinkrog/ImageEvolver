@@ -83,20 +83,24 @@ namespace ImageEvolver.Rendering.OpenGL
 
         private Bitmap RenderCandidateInternal(IImageCandidate candidate)
         {
-            _glManager.ClearColor = Color4.White;
-            _glManager.ClearScreen(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
             _glManager.PushRenderState();
 
-            _glManager.Projection = _renderOptions.Projection;
-            _glManager.Projection = _renderOptions.Ortho;
-            _glManager.View = Matrix4.Identity;
+            _glManager.BlendingEnabled = true;
+            _glManager.BlendingSource = BlendingFactorSrc.SrcAlpha;
+            _glManager.BlendingDestination = BlendingFactorDest.OneMinusSrcAlpha;
 
+            // Use a orthographic projection
+            _glManager.Projection = _renderOptions.Ortho;
+            _glManager.World = Matrix4.Identity;
+            _glManager.View = Matrix4.Identity;
+            
             _glManager.PushFrameBuffer(_frameBuffer);
 
             // Set the background color
             _glManager.ClearColor = candidate.BackgroundColor;
             _glManager.ClearScreen(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            _glManager.BindTechnique(_technique);
 
             foreach (var feature in candidate.Features)
             {
@@ -129,11 +133,12 @@ namespace ImageEvolver.Rendering.OpenGL
 
         private void RenderPolygon(PolygonFeature feature)
         {
-            var points = feature.Points.Select(a => new Vector2(a.X, a.Y))
-                                .ToList();
+            var vertices2 = feature.Points.Select(a => new Vector2(a.X, a.Y))
+                                   .ToList();
+
             List<ushort> indices = null;
             var edges = new Delaunay2D.DelaunayTriangulator();
-            if (edges.Initialize(points, 0.00001f))
+            if (edges.Initialize(vertices2, 0.00001f))
             {
                 edges.Process();
             }
@@ -141,13 +146,8 @@ namespace ImageEvolver.Rendering.OpenGL
             var e = edges.ToArray();
             var numTriangles = edges.ToIndexBuffer(out indices);
 
-            // Use a orthographic projection
-            _glManager.Projection = _renderOptions.Ortho;
-            _glManager.World = Matrix4.Identity;
-            _glManager.View = Matrix4.Identity;
-
             var indicesArray = indices.ToArray();
-            var vectorPointsArray = points.ToArray();
+            var vectorPointsArray = vertices2.ToArray();
 
             // Create three vertex buffers. One for each data type (vertex, texture coordinate and normal)
             var verticesBuffer = new VertexBuffer(BufferUsageHint.StaticDraw, (int) BufferAttribute.Vertex, vectorPointsArray);
@@ -155,12 +155,6 @@ namespace ImageEvolver.Rendering.OpenGL
 
             // Create the vertex array which encapsulates the state changes needed to enable the vertex buffers
             var vertexArray = new VertexArray(verticesBuffer);
-
-            _glManager.BindTechnique(_technique);
-
-            _glManager.BlendingEnabled = true;
-            _glManager.BlendingSource = BlendingFactorSrc.SrcAlpha;
-            _glManager.BlendingDestination = BlendingFactorDest.OneMinusSrcAlpha;
 
             _technique.UseTexture = false;
             _technique.DrawColor = new Color4(feature.Color.Red/255f, feature.Color.Green/255f, feature.Color.Blue/255f, feature.Color.Alpha/255f);
