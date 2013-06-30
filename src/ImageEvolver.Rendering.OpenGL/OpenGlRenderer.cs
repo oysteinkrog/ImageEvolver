@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -117,12 +118,29 @@ namespace ImageEvolver.Rendering.OpenGL
             _glManager.BlendingSource = BlendingFactorSrc.SrcAlpha;
             _glManager.BlendingDestination = BlendingFactorDest.OneMinusSrcAlpha;
 
+            _glManager.PushFrameBuffer(_frameBuffer);
+
+            // all the features are given their own "layer", startin with negative z-index and building up to our znear (0)
+            var numLayers = candidate.Features.Count();
+
+            var zLayerDelta = 1f;
+
             // Use a orthographic projection
-            _glManager.Projection = _renderOptions.Ortho;
+            var zNear = 0f;
+            var zFar = -(numLayers*zLayerDelta);
+
+            // use pixel offset of 0.5f, due to how the opengl rasterization rules specify that a pixel position is in it's center (0.5f)
+            // we want gdi/direct3d behaviour, where the pixel position is in the top left corner
+
+            const float pixelOffset = -0.5f;
+            _glManager.Projection = Matrix4.CreateOrthographicOffCenter(0f + pixelOffset,
+                                                                        _size.Width + pixelOffset,
+                                                                        _size.Height + pixelOffset,
+                                                                        0f + pixelOffset,
+                                                                        -(zNear + zLayerDelta),
+                                                                        -(zFar - zLayerDelta));
             _glManager.World = Matrix4.Identity;
             _glManager.View = Matrix4.Identity;
-
-            _glManager.PushFrameBuffer(_frameBuffer);
 
             // Set the background color
             _glManager.ClearColor = candidate.BackgroundColor;
@@ -134,8 +152,7 @@ namespace ImageEvolver.Rendering.OpenGL
             var indices = new List<ushort>();
             var colors = new List<Color4>();
 
-            var zIndex = -(float) candidate.Features.Count();
-
+            var zIndex = zFar;
             foreach (var feature in candidate.Features)
             {
                 var result = GenerateGeometry(feature);
@@ -144,7 +161,8 @@ namespace ImageEvolver.Rendering.OpenGL
                 vertexes.AddRange(result.VertexList.Select(a => new Vector3(a.X, a.Y, zIndex)));
                 colors.AddRange(result.ColorList);
 
-                zIndex++;
+                zIndex += zLayerDelta;
+                Debug.Assert(zIndex <= zNear);
             }
 
             // Create three vertex buffers. One for each data type (vertex, texture coordinate and normal)
