@@ -30,7 +30,6 @@ using ImageEvolver.Features;
 using ImageEvolver.Rendering.OpenGL.Triangulation;
 using Koeky3D;
 using Koeky3D.BufferHandling;
-using Koeky3D.Shaders;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -44,7 +43,7 @@ namespace ImageEvolver.Rendering.OpenGL
         private FrameBuffer _frameBuffer;
         private GLManager _glManager;
         private RenderOptions _renderOptions;
-        private DefaultTechnique _technique;
+        private RenderingTechnique _technique;
 
         public OpenGlRenderer(Size size)
         {
@@ -54,8 +53,8 @@ namespace ImageEvolver.Rendering.OpenGL
             {
                 _renderOptions = new RenderOptions(_size.Width, _size.Height, Window.WindowState, VSyncMode.Off);
                 _glManager = new GLManager(_renderOptions);
-                _frameBuffer = new FrameBuffer(_size.Width, _size.Height, 1, false);
-                _technique = new DefaultTechnique();
+                _frameBuffer = new FrameBuffer(_size.Width, _size.Height, 1, true);
+                _technique = new RenderingTechnique();
                 if (!_technique.Initialise())
                 {
                     throw new Exception("Technique failed to initialize");
@@ -68,22 +67,51 @@ namespace ImageEvolver.Rendering.OpenGL
             return GLTaskFactory.StartNew(() => RenderCandidateInternal(candidate));
         }
 
-        private void Render(IFeature feature)
+        private FeatureGeometry GenerateGeometry(IFeature feature)
         {
             var polygonFeature = feature as PolygonFeature;
             if (polygonFeature != null)
             {
-                RenderPolygon(polygonFeature);
+                return GeneratePolygonGeometry(polygonFeature);
             }
-            else
+            throw new NotSupportedException(string.Format("Rendering feature of type {0} is not supported", feature.GetType()));
+        }
+
+        private FeatureGeometry GeneratePolygonGeometry(PolygonFeature feature)
+        {
+            var vertexList = feature.Points.Select(a => new Vector2(a.X, a.Y))
+                                    .ToList();
+
+            List<ushort> indexList;
+            var edges = new Delaunay2D.DelaunayTriangulator();
+            if (edges.Initialize(vertexList, 0.00001f))
             {
-                throw new NotSupportedException(string.Format("Rendering feature of type {0} is not supported", feature.GetType()));
+                edges.Process();
             }
+
+            edges.ToIndexBuffer(out indexList);
+
+            var color = new Color4(feature.Color.Red/255f, feature.Color.Green/255f, feature.Color.Blue/255f, feature.Color.Alpha/255f);
+            var colorList = new List<Color4>();
+            for (var i = 0; i < vertexList.Count; i++)
+            {
+                colorList.Add(color);
+            }
+
+            return new FeatureGeometry
+                   {
+                       VertexList = vertexList,
+                       IndexList = indexList,
+                       ColorList = colorList,
+                   };
         }
 
         private Bitmap RenderCandidateInternal(IImageCandidate candidate)
         {
             _glManager.PushRenderState();
+
+            _glManager.DepthTestEnabled = true;
+            _glManager.DepthTestFunction = DepthFunction.Less;
 
             _glManager.BlendingEnabled = true;
             _glManager.BlendingSource = BlendingFactorSrc.SrcAlpha;
@@ -93,7 +121,7 @@ namespace ImageEvolver.Rendering.OpenGL
             _glManager.Projection = _renderOptions.Ortho;
             _glManager.World = Matrix4.Identity;
             _glManager.View = Matrix4.Identity;
-            
+
             _glManager.PushFrameBuffer(_frameBuffer);
 
             // Set the background color
@@ -102,10 +130,36 @@ namespace ImageEvolver.Rendering.OpenGL
 
             _glManager.BindTechnique(_technique);
 
+            var vertexes = new List<Vector3>();
+            var indices = new List<ushort>();
+            var colors = new List<Color4>();
+
+            var zIndex = -(float) candidate.Features.Count();
+
             foreach (var feature in candidate.Features)
             {
-                Render(feature);
+                var result = GenerateGeometry(feature);
+
+                indices.AddRange(result.IndexList.Select(a => (ushort) (a + vertexes.Count)));
+                vertexes.AddRange(result.VertexList.Select(a => new Vector3(a.X, a.Y, zIndex)));
+                colors.AddRange(result.ColorList);
+
+                zIndex++;
             }
+
+            // Create three vertex buffers. One for each data type (vertex, texture coordinate and normal)
+            var vertexBuffer = new VertexBuffer(BufferUsageHint.StaticDraw, (int) BufferAttribute.Vertex, vertexes.ToArray());
+            var colorBuffer = new VertexBuffer(BufferUsageHint.StaticDraw, (int) BufferAttribute.Color, colors.ToArray());
+            var indexBuffer = new IndexBuffer(BufferUsageHint.StaticDraw, indices.ToArray());
+
+            // Create the vertex array which encapsulates the state changes needed to enable the vertex buffers
+            var vertexArray = new VertexArray(indexBuffer, vertexBuffer, colorBuffer);
+
+            // Draw the data
+            _glManager.BindVertexArray(vertexArray);
+            _glManager.DrawElementsIndexed(BeginMode.Triangles, indexBuffer.Count, 0);
+
+            vertexArray.ClearResources(true);
 
             var bitmap = new Bitmap(_size.Width, _size.Height);
             var data = bitmap.LockBits(new Rectangle(0, 0, _size.Width, _size.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
@@ -131,41 +185,11 @@ namespace ImageEvolver.Rendering.OpenGL
             return bitmap;
         }
 
-        private void RenderPolygon(PolygonFeature feature)
+        private struct FeatureGeometry
         {
-            var vertices2 = feature.Points.Select(a => new Vector2(a.X, a.Y))
-                                   .ToList();
-
-            List<ushort> indices = null;
-            var edges = new Delaunay2D.DelaunayTriangulator();
-            if (edges.Initialize(vertices2, 0.00001f))
-            {
-                edges.Process();
-            }
-
-            var e = edges.ToArray();
-            var numTriangles = edges.ToIndexBuffer(out indices);
-
-            var indicesArray = indices.ToArray();
-            var vectorPointsArray = vertices2.ToArray();
-
-            // Create three vertex buffers. One for each data type (vertex, texture coordinate and normal)
-            var verticesBuffer = new VertexBuffer(BufferUsageHint.StaticDraw, (int) BufferAttribute.Vertex, vectorPointsArray);
-            var indexBuffer = new IndexBuffer(BufferUsageHint.StaticDraw, indicesArray);
-
-            // Create the vertex array which encapsulates the state changes needed to enable the vertex buffers
-            var vertexArray = new VertexArray(indexBuffer, verticesBuffer);
-
-            _technique.UseTexture = false;
-            _technique.DrawColor = new Color4(feature.Color.Red/255f, feature.Color.Green/255f, feature.Color.Blue/255f, feature.Color.Alpha/255f);
-
-            // Draw the data
-            _glManager.BindVertexArray(vertexArray);
-            _glManager.DrawElementsIndexed(BeginMode.Triangles, indicesArray.Length, 0);
-
-            verticesBuffer.ClearResources();
-            indexBuffer.ClearResources();
-            vertexArray.ClearResources(true);
+            public List<Color4> ColorList { get; set; }
+            public List<ushort> IndexList { get; set; }
+            public List<Vector2> VertexList { get; set; }
         }
     }
 }

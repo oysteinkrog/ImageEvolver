@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RenderingTechnique.cs" />
     <Compile Include="GenericFeaturesRendererOpenGL.cs">
       <SubType>Code</SubType>
     </Compile>
