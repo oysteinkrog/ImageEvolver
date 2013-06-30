@@ -71,7 +71,7 @@ namespace ImageEvolver.Rendering.Bitmap
 
         public System.Drawing.Bitmap Render(IImageCandidate candidate)
         {
-            _g.Clear(Color.Black);
+            _g.Clear(candidate.BackgroundColor);
 
             foreach (IFeature feature in candidate.Features)
             {

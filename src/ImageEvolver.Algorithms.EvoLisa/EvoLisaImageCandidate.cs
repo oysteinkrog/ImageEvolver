@@ -55,6 +55,14 @@ namespace ImageEvolver.Algorithms.EvoLisa
             get { return Polygons; }
         }
 
+        public Color BackgroundColor
+        {
+            get
+            {
+                return Color.Black;
+            }
+        }
+
         public Size Size { get; private set; }
 
         public EvoLisaImageCandidate Clone()

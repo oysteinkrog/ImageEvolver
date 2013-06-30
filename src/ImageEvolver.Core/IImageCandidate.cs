@@ -25,6 +25,8 @@ namespace ImageEvolver.Core
 {
     public interface IImageCandidate : IFeatures
     {
+        Color BackgroundColor { get; }
+         
         Size Size { get; }
     }
 }

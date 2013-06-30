@@ -83,7 +83,6 @@ namespace ImageEvolver.Rendering.OpenGL
 
         private Bitmap RenderCandidateInternal(IImageCandidate candidate)
         {
-            // Set the background color
             _glManager.ClearColor = Color4.White;
             _glManager.ClearScreen(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -95,8 +94,8 @@ namespace ImageEvolver.Rendering.OpenGL
 
             _glManager.PushFrameBuffer(_frameBuffer);
 
-            // Clear the screen using a blue color
-            _glManager.ClearColor = Color4.Black;
+            // Set the background color
+            _glManager.ClearColor = candidate.BackgroundColor;
             _glManager.ClearScreen(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             foreach (var feature in candidate.Features)
