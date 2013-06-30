@@ -55,6 +55,9 @@
     <Compile Include="GenericFeaturesRendererOpenGL.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="RenderingContextBase.cs" />
+    <Compile Include="SingleThreadTaskScheduler.cs" />
+    <Compile Include="OpenGlRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Triangulation\Delaunay2D.cs" />
     <Compile Include="Triangulation\IntegerTriangle.cs" />
