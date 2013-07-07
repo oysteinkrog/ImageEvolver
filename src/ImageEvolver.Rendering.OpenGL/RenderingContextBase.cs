@@ -25,7 +25,7 @@ using OpenTK.Graphics;
 
 namespace ImageEvolver.Rendering.OpenGL
 {
-    internal class RenderingContextBase : IDisposable
+    public class RenderingContextBase : IDisposable
     {
         protected readonly TaskFactory GLTaskFactory;
         protected GraphicsContext GraphicsContext;
