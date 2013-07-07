@@ -57,10 +57,14 @@ namespace ImageEvolver.Apps.ConsoleTestApp
                                     {
                                         if (evolutionEngine.Step())
                                         {
-                                            Console.WriteLine("{0} {1} {2:0.000}",
-                                                              evolutionEngine.Selected,
-                                                              evolutionEngine.Generation,
-                                                              evolutionEngine.CurrentBestFitness);
+                                            var perfDetails = evolutionEngine.GetPerformanceDetails();
+
+                                            Console.WriteLine("Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Fitness {4:0.000}",
+                                                evolutionEngine.Selected,
+                                                evolutionEngine.Generation,
+                                                evolutionEngine.CurrentBestFitness,
+                                                perfDetails.RelativeMutationTime,
+                                                perfDetails.RelativeFitnessEvaluationTime);
 
                                             // print every 100 better-fitness selection
                                             if (evolutionEngine.Selected%100 == 0)

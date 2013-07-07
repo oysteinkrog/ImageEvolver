@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using ImageEvolver.Core.Fitness;
 using JetBrains.Annotations;
 
@@ -31,11 +32,13 @@ namespace ImageEvolver.Core.Engines
     public sealed class BasicEngine<TCandidate> : IEvolutionEngine where TCandidate : IImageCandidate
     {
         private readonly ICandidateGenerator<TCandidate> _candidateGenerator;
+        private readonly Stopwatch _candidateStopwatch = new Stopwatch();
         private readonly IFitnessEvaluator<TCandidate> _fitnessEvaluator;
+        private readonly Stopwatch _fitnessStopwatch = new Stopwatch();
         private readonly object _syncRoot = new object();
+        private readonly Stopwatch _totalStopwatch = new Stopwatch();
 
-        public BasicEngine(ICandidateGenerator<TCandidate> candidateGenerator,
-                           IFitnessEvaluator<TCandidate> fitnessEvaluator)
+        public BasicEngine(ICandidateGenerator<TCandidate> candidateGenerator, IFitnessEvaluator<TCandidate> fitnessEvaluator)
         {
             if (candidateGenerator == null)
             {
@@ -56,38 +59,30 @@ namespace ImageEvolver.Core.Engines
         public void Dispose() {}
 
         [PublicAPI]
-        public long Candidates
-        {
-            get;
-            set;
-        }
+        public long Candidates { get; set; }
 
         [PublicAPI]
-        public TCandidate CurrentBestCandidate
-        {
-            get;
-            private set;
-        }
+        public TCandidate CurrentBestCandidate { get; private set; }
 
         [PublicAPI]
-        public double CurrentBestFitness
-        {
-            get;
-            private set;
-        }
+        public double CurrentBestFitness { get; private set; }
 
         [PublicAPI]
-        public long Generation
-        {
-            get;
-            private set;
-        }
+        public long Generation { get; private set; }
 
         [PublicAPI]
-        public long Selected
+        public long Selected { get; private set; }
+
+        [PublicAPI]
+        public PerformanceDetails GetPerformanceDetails()
         {
-            get;
-            private set;
+            var total = (double) _totalStopwatch.ElapsedMilliseconds;
+
+            return new PerformanceDetails
+                   {
+                       RelativeMutationTime = _candidateStopwatch.ElapsedMilliseconds/total,
+                       RelativeFitnessEvaluationTime = _fitnessStopwatch.ElapsedMilliseconds/total
+                   };
         }
 
         [PublicAPI]
@@ -95,29 +90,48 @@ namespace ImageEvolver.Core.Engines
         {
             lock (_syncRoot)
             {
-                // generate a new candidate from the single parent (no crossover/recombination)
-                bool mutated;
-                TCandidate newCandidate = _candidateGenerator.GenerateCandidate(CurrentBestCandidate, out mutated);
+                _totalStopwatch.Start();
 
-                Candidates++;
-                if (mutated)
+                try
                 {
-                    Generation++;
+                    // generate a new candidate from the single parent (no crossover/recombination)
+                    bool mutated;
+                    _candidateStopwatch.Start();
+                    TCandidate newCandidate = _candidateGenerator.GenerateCandidate(CurrentBestCandidate, out mutated);
+                    _candidateStopwatch.Stop();
 
-                    // evaluate fitness of the new candidate
-                    double newFitness = _fitnessEvaluator.EvaluateFitness(newCandidate);
-
-                    if (newFitness <= CurrentBestFitness)
+                    Candidates++;
+                    if (mutated)
                     {
-                        CurrentBestCandidate = newCandidate;
-                        CurrentBestFitness = newFitness;
-                        Selected++;
-                        return true;
-                    }
-                }
+                        Generation++;
 
-                return false;
+                        _fitnessStopwatch.Start();
+                        // evaluate fitness of the new candidate
+                        double newFitness = _fitnessEvaluator.EvaluateFitness(newCandidate);
+                        _fitnessStopwatch.Stop();
+
+                        if (newFitness <= CurrentBestFitness)
+                        {
+                            CurrentBestCandidate = newCandidate;
+                            CurrentBestFitness = newFitness;
+                            Selected++;
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+                finally
+                {
+                    _totalStopwatch.Stop();
+                }
             }
+        }
+
+        public struct PerformanceDetails
+        {
+            public double RelativeFitnessEvaluationTime;
+            public double RelativeMutationTime;
         }
     }
 }
