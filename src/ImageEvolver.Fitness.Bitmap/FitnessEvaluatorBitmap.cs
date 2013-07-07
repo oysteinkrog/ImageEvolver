@@ -23,20 +23,20 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using ImageEvolver.Core.Fitness;
 
-namespace ImageEvolver.Fitness
+namespace ImageEvolver.Fitness.Bitmap
 {
     /// <summary>
     /// </summary>
     /// <remarks>
     ///     Performance optimizations from http://danbystrom.se/2008/12/14/improving-performance/
     /// </remarks>
-    public sealed class FitnessEvaluatorBitmap : IDisposable, IFitnessEvaluator<Bitmap>
+    public sealed class FitnessEvaluatorBitmap : IDisposable, IFitnessEvaluator<System.Drawing.Bitmap>
     {
         private readonly FitnessEquation _equationType;
         private readonly Pixel[] _sourceImagePixels;
-        private readonly Func<Pixel[], Bitmap, double> _fitnessEquation;
+        private readonly Func<Pixel[], System.Drawing.Bitmap, double> _fitnessEquation;
 
-        public FitnessEvaluatorBitmap(Bitmap sourceBitmap, FitnessEquation equationType)
+        public FitnessEvaluatorBitmap(System.Drawing.Bitmap sourceBitmap, FitnessEquation equationType)
         {
             _equationType = equationType;
             _sourceImagePixels = GenerateSourceColorMatrix(sourceBitmap);
@@ -69,9 +69,9 @@ namespace ImageEvolver.Fitness
             }
         }
 
-        public double EvaluateFitness(Bitmap input)
+        public double EvaluateFitness(System.Drawing.Bitmap candidate)
         {
-            return _fitnessEquation(_sourceImagePixels, input);
+            return _fitnessEquation(_sourceImagePixels, candidate);
         }
 
         ~FitnessEvaluatorBitmap()
@@ -94,7 +94,7 @@ namespace ImageEvolver.Fitness
             // free native resources if there are any.
         }
 
-        private static Pixel[] GenerateSourceColorMatrix(Bitmap sourceImage)
+        private static Pixel[] GenerateSourceColorMatrix(System.Drawing.Bitmap sourceImage)
         {
             if (sourceImage == null)
             {

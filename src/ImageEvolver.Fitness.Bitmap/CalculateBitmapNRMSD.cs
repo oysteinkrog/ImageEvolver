@@ -19,13 +19,12 @@
 #endregion
 
 using System;
-using System.Drawing;
 
-namespace ImageEvolver.Fitness
+namespace ImageEvolver.Fitness.Bitmap
 {
     public static class CalculateBitmapNRMSD
     {
-        public static double EvaluateFitness(Pixel[] sourceImagePixelCache, Bitmap bitmap)
+        public static double EvaluateFitness(Pixel[] sourceImagePixelCache, System.Drawing.Bitmap bitmap)
         {
             return Math.Sqrt(CalculateBitmapMSE.EvaluateFitness(sourceImagePixelCache, bitmap)) / 255.0;
         }

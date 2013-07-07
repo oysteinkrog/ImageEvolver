@@ -24,7 +24,7 @@ using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;
 using ImageEvolver.Core.Engines;
 using ImageEvolver.Core.Random;
-using ImageEvolver.Fitness;
+using ImageEvolver.Fitness.Bitmap;
 using ImageEvolver.Rendering.Bitmap;
 using ImageEvolver.Rendering.OpenGL;
 using ImageEvolver.Resources.Images;

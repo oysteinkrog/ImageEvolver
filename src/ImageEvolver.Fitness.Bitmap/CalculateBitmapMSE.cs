@@ -21,13 +21,15 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace ImageEvolver.Fitness
+namespace ImageEvolver.Fitness.Bitmap
 {
-    public static class CalculateBitmapSimpleSE
+    public static class CalculateBitmapMSE
     {
-        public static double EvaluateFitness(Pixel[] sourceImagePixelCache, Bitmap bitmap)
+        public static double EvaluateFitness(Pixel[] sourceImagePixelCache, System.Drawing.Bitmap bitmap)
         {
-            double error = 0;
+            double sumRedError = 0;
+            double sumGreenError = 0;
+            double sumBlueError = 0;
 
             BitmapData bd = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             try
@@ -46,8 +48,9 @@ namespace ImageEvolver.Fitness
                                 int g = p1->G - p2->G;
                                 int b = p1->B - p2->B;
 
-                                // r^2 + g^2 + b^2
-                                error += r * r + g * g + b * b;
+                                sumRedError += r*r;
+                                sumGreenError += g*g;
+                                sumBlueError += b*b;
                             }
                         }
                     }
@@ -58,7 +61,12 @@ namespace ImageEvolver.Fitness
                 bitmap.UnlockBits(bd);
             }
 
-            return error;
+            var mseRed = sumRedError / sourceImagePixelCache.Length;
+            var mseGreen = sumGreenError / sourceImagePixelCache.Length;
+            var mseBlue = sumBlueError / sourceImagePixelCache.Length;
+
+            // Average mean square error of R, G, B.
+            return (mseRed + mseGreen + mseBlue) / 3.0;
         }
     }
 }

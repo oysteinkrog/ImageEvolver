@@ -18,16 +18,15 @@
 
 #endregion
 
-using System.Runtime.InteropServices;
+using System;
 
-namespace ImageEvolver.Fitness
+namespace ImageEvolver.Fitness.Bitmap
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct Pixel
+    public static class CalculateBitmapRMSD
     {
-        internal readonly byte B;
-        internal readonly byte G;
-        internal readonly byte R;
-        internal readonly byte A;
+        public static double EvaluateFitness(Pixel[] sourceImagePixelCache, System.Drawing.Bitmap bitmap)
+        {
+            return Math.Sqrt(CalculateBitmapMSE.EvaluateFitness(sourceImagePixelCache, bitmap));
+        }
     }
 }

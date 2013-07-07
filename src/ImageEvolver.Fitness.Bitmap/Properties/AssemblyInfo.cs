@@ -21,11 +21,11 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("ImageEvolver.Fitness")]
+[assembly: AssemblyTitle("ImageEvolver.Fitness.Bitmap")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ImageEvolver.Fitness")]
+[assembly: AssemblyProduct("ImageEvolver.Fitness.Bitmap")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

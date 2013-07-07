@@ -22,6 +22,6 @@ namespace ImageEvolver.Core.Fitness
 {
     public interface IFitnessEvaluator<in T>
     {
-        double EvaluateFitness(T input);
+        double EvaluateFitness(T candidate);
     }
 }

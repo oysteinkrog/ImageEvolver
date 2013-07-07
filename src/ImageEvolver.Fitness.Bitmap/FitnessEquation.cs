@@ -18,7 +18,7 @@
 
 #endregion
 
-namespace ImageEvolver.Fitness
+namespace ImageEvolver.Fitness.Bitmap
 {
     public enum FitnessEquation
     {

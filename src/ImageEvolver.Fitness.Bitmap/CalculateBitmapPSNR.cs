@@ -19,14 +19,12 @@
 #endregion
 
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 
-namespace ImageEvolver.Fitness
+namespace ImageEvolver.Fitness.Bitmap
 {
     public static class CalculateBitmapPSNR
     {
-        public static double EvaluateFitness(Pixel[] sourceImagePixelCache, Bitmap bitmap)
+        public static double EvaluateFitness(Pixel[] sourceImagePixelCache, System.Drawing.Bitmap bitmap)
         {
             // mean square error
             var mse = CalculateBitmapMSE.EvaluateFitness(sourceImagePixelCache, bitmap);

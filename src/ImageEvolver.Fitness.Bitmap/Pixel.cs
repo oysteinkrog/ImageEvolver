@@ -18,15 +18,16 @@
 
 #endregion
 
-using System.Drawing;
+using System.Runtime.InteropServices;
 
-namespace ImageEvolver.Fitness
+namespace ImageEvolver.Fitness.Bitmap
 {
-    public static class CalculateBitmapMAE
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Pixel
     {
-        public static double EvaluateFitness(Pixel[] sourceImagePixelCache, Bitmap bitmap)
-        {
-            return CalculateBitmapAE.EvaluateFitness(sourceImagePixelCache, bitmap) / sourceImagePixelCache.Length;
-        }
+        internal readonly byte B;
+        internal readonly byte G;
+        internal readonly byte R;
+        internal readonly byte A;
     }
 }

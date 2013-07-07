@@ -1,15 +1,14 @@
-﻿using System.Drawing;
-using ImageEvolver.Core;
+﻿using ImageEvolver.Core;
 using ImageEvolver.Core.Fitness;
 
-namespace ImageEvolver.Fitness
+namespace ImageEvolver.Fitness.Bitmap
 {
-    internal class FitnessEvaluatorCandidateBitmap : IFitnessEvaluator<IImageCandidate>
+    public class FitnessEvaluatorCandidateBitmap : IFitnessEvaluator<IImageCandidate>
     {
-        private readonly IImageCandidateRenderer<IImageCandidate, Bitmap> _renderer;
+        private readonly IImageCandidateRenderer<IImageCandidate, System.Drawing.Bitmap> _renderer;
         private readonly FitnessEvaluatorBitmap _bitmapFitnessEvalutor;
 
-        public FitnessEvaluatorCandidateBitmap(IImageCandidateRenderer<IImageCandidate, Bitmap> renderer, FitnessEvaluatorBitmap bitmapFitnessEvalutor)
+        public FitnessEvaluatorCandidateBitmap(IImageCandidateRenderer<IImageCandidate, System.Drawing.Bitmap> renderer, FitnessEvaluatorBitmap bitmapFitnessEvalutor)
         {
             _renderer = renderer;
             _bitmapFitnessEvalutor = bitmapFitnessEvalutor;
