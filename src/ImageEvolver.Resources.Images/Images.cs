@@ -19,15 +19,27 @@
 #endregion
 
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 
 namespace ImageEvolver.Resources.Images
 {
     public static class Images
     {
-        public static Bitmap MonaLisa
+
+        public static Bitmap MonaLisa_Big
         {
-            get { return GetImageByName("MonaLisa.bmp"); }
+            get { return GetImageByName("MonaLisa_Big.jpg"); }
+        }
+
+        public static Bitmap MonaLisa_EvoLisa200x200
+        {
+            get { return GetImageByName("MonaLisa_EvoLisa200x200.bmp"); }
+        }
+
+        public static Bitmap MonaLisa_EvoLisa200x200_TestApproximation
+        {
+            get { return GetImageByName("MonaLisa_EvoLisa200x200-approx-28400-278805.bmp"); }
         }
 
         private static Bitmap GetImageByName(string imageName)
@@ -36,6 +48,17 @@ namespace ImageEvolver.Resources.Images
             {
                 return new Bitmap(s);
             }
+        }
+
+        public static Bitmap Resize(Bitmap bp, double scale)
+        {
+            Bitmap bmp = new Bitmap((int)(bp.Width * scale), (int)(bp.Height * scale));
+            Graphics graph = Graphics.FromImage(bmp);
+//            graph.InterpolationMode = InterpolationMode.High;
+//            graph.CompositingQuality = CompositingQuality.HighQuality;
+//            graph.SmoothingMode = SmoothingMode.AntiAlias;
+            graph.DrawImage(bp, new Rectangle(0, 0, bmp.Width, bmp.Height));
+            return bmp;
         }
     }
 }

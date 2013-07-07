@@ -39,7 +39,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MonaLisa.bmp" />
+    <EmbeddedResource Include="MonaLisa_EvoLisa200x200-approx-28400-278805.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MonaLisa_Big.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MonaLisa_EvoLisa200x200.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

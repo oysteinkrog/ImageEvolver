@@ -142,7 +142,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
         [Test]
         public void TestBitmapRenderer()
         {
-            var sourceImage = Images.MonaLisa;
+            var sourceImage = Images.MonaLisa_EvoLisa200x200;
             using (var renderer = new GenericFeaturesRendererBitmap(sourceImage.Size))
             {
                 using (var basicPseudoRandomProvider = new BasicPseudoRandomProvider(0))
@@ -155,7 +155,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
         [Test]
         public void TestOpenGLRenderer()
         {
-            var sourceImage = Images.MonaLisa;
+            var sourceImage = Images.MonaLisa_EvoLisa200x200;
             using (var renderer = new GenericFeaturesRendererOpenGL(sourceImage.Size))
             {
                 using (var basicPseudoRandomProvider = new BasicPseudoRandomProvider(0))

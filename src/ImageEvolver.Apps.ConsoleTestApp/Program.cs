@@ -35,7 +35,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
     {
         private static void Main(string[] args)
         {
-            Bitmap sourceImage = Images.MonaLisa;
+            Bitmap sourceImage = Images.MonaLisa_EvoLisa200x200;
             var evoLisaAlgorithmSettings = new EvoLisaAlgorithmSettings();
 
             using (var basicPseudoRandomProvider = new BasicPseudoRandomProvider(0))
