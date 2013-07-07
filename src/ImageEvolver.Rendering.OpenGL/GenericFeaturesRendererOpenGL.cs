@@ -57,6 +57,17 @@ namespace ImageEvolver.Rendering.OpenGL
                 {
                     throw new Exception("Technique failed to initialize");
                 }
+
+                _glManager.PushRenderState();
+
+                _glManager.DepthTestEnabled = true;
+                _glManager.DepthTestFunction = DepthFunction.Less;
+
+                _glManager.BlendingEnabled = true;
+                _glManager.BlendingSource = BlendingFactorSrc.SrcAlpha;
+                _glManager.BlendingDestination = BlendingFactorDest.OneMinusSrcAlpha;
+
+                _glManager.PushFrameBuffer(_frameBuffer);
             });
         }
         
@@ -68,23 +79,29 @@ namespace ImageEvolver.Rendering.OpenGL
 
         public Task<Bitmap> RenderCandidateAsync(IImageCandidate candidate)
         {
-            return GLTaskFactory.StartNew(() => RenderCandidateInternal(candidate));
+            return GLTaskFactory.StartNew(() =>
+            {
+                RenderCandidateInternal(candidate);
+
+                var bitmap = new Bitmap(_size.Width, _size.Height);
+                var data = bitmap.LockBits(new Rectangle(0, 0, _size.Width, _size.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+                try
+                {
+                    GL.ReadPixels(0, 0, _size.Width, _size.Height, OpenTK.Graphics.OpenGL.PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
+                }
+                finally
+                {
+                    bitmap.UnlockBits(data);
+                }
+
+                bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                return bitmap;
+            });
         }
 
 
-        private Bitmap RenderCandidateInternal(IImageCandidate candidate)
+        private void RenderCandidateInternal(IImageCandidate candidate)
         {
-            _glManager.PushRenderState();
-
-            _glManager.DepthTestEnabled = true;
-            _glManager.DepthTestFunction = DepthFunction.Less;
-
-            _glManager.BlendingEnabled = true;
-            _glManager.BlendingSource = BlendingFactorSrc.SrcAlpha;
-            _glManager.BlendingDestination = BlendingFactorDest.OneMinusSrcAlpha;
-
-            _glManager.PushFrameBuffer(_frameBuffer);
-
             // all the features are given their own "layer", startin with negative z-index and building up to our znear (0)
             var numLayers = candidate.Features.Count();
 
@@ -143,29 +160,6 @@ namespace ImageEvolver.Rendering.OpenGL
             _glManager.DrawElementsIndexed(BeginMode.Triangles, indexBuffer.Count, 0);
 
             vertexArray.ClearResources(true);
-
-            var bitmap = new Bitmap(_size.Width, _size.Height);
-            var data = bitmap.LockBits(new Rectangle(0, 0, _size.Width, _size.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-            try
-            {
-                GL.ReadPixels(0, 0, _size.Width, _size.Height, OpenTK.Graphics.OpenGL.PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
-            }
-            finally
-            {
-                bitmap.UnlockBits(data);
-            }
-
-            //            bitmap.Save("test.bmp");
-
-            bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-
-            // Restore the previous frame buffer
-            _glManager.PopFrameBuffer();
-
-            // Restore the settings saved by calling PushRenderState at the start of this method
-            _glManager.PopRenderState();
-
-            return bitmap;
         }
     }
 }
