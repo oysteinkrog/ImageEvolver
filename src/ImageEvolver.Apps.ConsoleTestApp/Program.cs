@@ -45,11 +45,13 @@ namespace ImageEvolver.Apps.ConsoleTestApp
 //                    using (var renderer = new GenericFeaturesRendererBitmap(sourceImage.Size))
                     using (var renderer = new GenericFeaturesRendererOpenGL(sourceImage.Size))
                     {
-                        using (var fitnessEvaluator = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.AE))
+                        using (var bitmapFitnessEvaluator = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.AE))
                         {
                             using (var candidateGenerator = evoLisaAlgorithm.CreateCandidateGenerator())
                             {
-                                using (var evolutionEngine = new BasicEngine<EvoLisaImageCandidate, Bitmap>(candidateGenerator, renderer, fitnessEvaluator))
+                                var candidateFitnessEvaluator = new FitnessEvaluatorCandidateBitmap(renderer, bitmapFitnessEvaluator);
+
+                                using (var evolutionEngine = new BasicEngine<EvoLisaImageCandidate>(candidateGenerator, candidateFitnessEvaluator))
                                 {
                                     while (!Console.KeyAvailable)
                                     {

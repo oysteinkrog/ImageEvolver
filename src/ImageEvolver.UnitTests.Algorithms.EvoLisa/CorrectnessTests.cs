@@ -52,11 +52,13 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
 
         private static void RunEngine(Bitmap sourceImage, EvoLisaAlgorithm evoLisaAlgorithm, IImageCandidateRenderer<IImageCandidate, Bitmap> renderer)
         {
-            using (var fitnessEvaluator = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.SimpleSE))
+            using (var bitmapFitnessEvalutor = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.SimpleSE))
             {
                 using (var candidateGenerator = evoLisaAlgorithm.CreateCandidateGenerator())
                 {
-                    using (var evolutionEngine = new BasicEngine<EvoLisaImageCandidate, Bitmap>(candidateGenerator, renderer, fitnessEvaluator))
+                    var candidateFitnessEvaluator = new FitnessEvaluatorCandidateBitmap(renderer, bitmapFitnessEvalutor);
+
+                    using (var evolutionEngine = new BasicEngine<EvoLisaImageCandidate>(candidateGenerator, candidateFitnessEvaluator))
                     {
                         RunEngine(evolutionEngine, renderer);
                     }
@@ -64,7 +66,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
             }
         }
 
-        private static void RunEngine(BasicEngine<EvoLisaImageCandidate, Bitmap> evolutionEngine, IImageCandidateRenderer<IImageCandidate, Bitmap> renderer)
+        private static void RunEngine(BasicEngine<EvoLisaImageCandidate> evolutionEngine, IImageCandidateRenderer<IImageCandidate, Bitmap> renderer)
         {
             while (evolutionEngine.Selected < 10000)
             {
@@ -78,7 +80,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
             }
         }
 
-        private static bool CheckEngineResults(BasicEngine<EvoLisaImageCandidate, Bitmap> evolutionEngine,
+        private static bool CheckEngineResults(BasicEngine<EvoLisaImageCandidate> evolutionEngine,
                                                IImageCandidateRenderer<IImageCandidate, Bitmap> renderer)
         {
             switch (evolutionEngine.Selected)

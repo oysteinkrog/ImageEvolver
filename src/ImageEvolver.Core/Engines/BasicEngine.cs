@@ -28,16 +28,14 @@ namespace ImageEvolver.Core.Engines
     ///     Basic evolutionary engine
     /// </summary>
     [PublicAPI]
-    public sealed class BasicEngine<TCandidate, TEval> : IEvolutionEngine where TCandidate : IImageCandidate
+    public sealed class BasicEngine<TCandidate> : IEvolutionEngine where TCandidate : IImageCandidate
     {
         private readonly ICandidateGenerator<TCandidate> _candidateGenerator;
-        private readonly IFitnessEvaluator<TEval> _fitnessEvaluator;
-        private readonly IImageCandidateRenderer<TCandidate, TEval> _renderer;
+        private readonly IFitnessEvaluator<TCandidate> _fitnessEvaluator;
         private readonly object _syncRoot = new object();
 
         public BasicEngine(ICandidateGenerator<TCandidate> candidateGenerator,
-                           IImageCandidateRenderer<TCandidate, TEval> renderer,
-                           IFitnessEvaluator<TEval> fitnessEvaluator)
+                           IFitnessEvaluator<TCandidate> fitnessEvaluator)
         {
             if (candidateGenerator == null)
             {
@@ -45,7 +43,6 @@ namespace ImageEvolver.Core.Engines
             }
 
             _candidateGenerator = candidateGenerator;
-            _renderer = renderer;
             _fitnessEvaluator = fitnessEvaluator;
 
             CurrentBestFitness = double.MaxValue;
@@ -107,10 +104,8 @@ namespace ImageEvolver.Core.Engines
                 {
                     Generation++;
 
-                    var newRender = _renderer.Render(newCandidate);
-
                     // evaluate fitness of the new candidate
-                    double newFitness = _fitnessEvaluator.EvaluateFitness(newRender);
+                    double newFitness = _fitnessEvaluator.EvaluateFitness(newCandidate);
 
                     if (newFitness <= CurrentBestFitness)
                     {
