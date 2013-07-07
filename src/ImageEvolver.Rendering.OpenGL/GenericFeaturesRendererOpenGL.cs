@@ -26,9 +26,6 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading.Tasks;
 using ImageEvolver.Core;
-using ImageEvolver.Core.Mutation;
-using ImageEvolver.Features;
-using ImageEvolver.Rendering.OpenGL.Triangulation;
 using Koeky3D;
 using Koeky3D.BufferHandling;
 using OpenTK;
@@ -74,44 +71,6 @@ namespace ImageEvolver.Rendering.OpenGL
             return GLTaskFactory.StartNew(() => RenderCandidateInternal(candidate));
         }
 
-        private FeatureGeometry GenerateGeometry(IFeature feature)
-        {
-            var polygonFeature = feature as PolygonFeature;
-            if (polygonFeature != null)
-            {
-                return GeneratePolygonGeometry(polygonFeature);
-            }
-            throw new NotSupportedException(string.Format("Rendering feature of type {0} is not supported", feature.GetType()));
-        }
-
-        private FeatureGeometry GeneratePolygonGeometry(PolygonFeature feature)
-        {
-            var vertexList = feature.Points.Select(a => new Vector2(a.X, a.Y))
-                                    .ToList();
-
-            List<ushort> indexList;
-            var edges = new Delaunay2D.DelaunayTriangulator();
-            if (edges.Initialize(vertexList, 0.00001f))
-            {
-                edges.Process();
-            }
-
-            edges.ToIndexBuffer(out indexList);
-
-            var color = new Color4(feature.Color.Red/255f, feature.Color.Green/255f, feature.Color.Blue/255f, feature.Color.Alpha/255f);
-            var colorList = new List<Color4>();
-            for (var i = 0; i < vertexList.Count; i++)
-            {
-                colorList.Add(color);
-            }
-
-            return new FeatureGeometry
-                   {
-                       VertexList = vertexList,
-                       IndexList = indexList,
-                       ColorList = colorList,
-                   };
-        }
 
         private Bitmap RenderCandidateInternal(IImageCandidate candidate)
         {
@@ -161,7 +120,7 @@ namespace ImageEvolver.Rendering.OpenGL
             var zIndex = zFar;
             foreach (var feature in candidate.Features)
             {
-                var result = GenerateGeometry(feature);
+                var result = TriangleGeometryGenerator.GenerateGeometry(feature);
 
                 indices.AddRange(result.IndexList.Select(a => (ushort) (a + vertexes.Count)));
                 vertexes.AddRange(result.VertexList.Select(a => new Vector3(a.X, a.Y, zIndex)));
@@ -207,13 +166,6 @@ namespace ImageEvolver.Rendering.OpenGL
             _glManager.PopRenderState();
 
             return bitmap;
-        }
-
-        private struct FeatureGeometry
-        {
-            public List<Color4> ColorList { get; set; }
-            public List<ushort> IndexList { get; set; }
-            public List<Vector2> VertexList { get; set; }
         }
     }
 }

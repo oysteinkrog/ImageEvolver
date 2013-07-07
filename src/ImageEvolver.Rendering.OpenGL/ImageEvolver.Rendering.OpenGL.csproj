@@ -57,6 +57,7 @@
     <Compile Include="SingleThreadTaskScheduler.cs" />
     <Compile Include="GenericFeaturesRendererOpenGL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TriangleGeometryGenerator.cs" />
     <Compile Include="Triangulation\Delaunay2D.cs" />
     <Compile Include="Triangulation\IntegerTriangle.cs" />
     <Compile Include="Triangulation\SPMath.cs" />
