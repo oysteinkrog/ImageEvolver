@@ -1,0 +1,4 @@
+[submodule "src/lib/Koeky3d"]
+	path = src/lib/Koeky3d
+	url = git@github.com:oysteinkrog/Koeky3D.git
+	ignore = untracked
