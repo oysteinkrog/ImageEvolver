@@ -50,15 +50,19 @@ namespace ImageEvolver.Resources.Images
             }
         }
 
-        public static Bitmap Resize(Bitmap bp, double scale)
+        public static Bitmap Resize(Bitmap sourceBMP, double scale)
         {
-            Bitmap bmp = new Bitmap((int)(bp.Width * scale), (int)(bp.Height * scale));
-            Graphics graph = Graphics.FromImage(bmp);
-//            graph.InterpolationMode = InterpolationMode.High;
-//            graph.CompositingQuality = CompositingQuality.HighQuality;
-//            graph.SmoothingMode = SmoothingMode.AntiAlias;
-            graph.DrawImage(bp, new Rectangle(0, 0, bmp.Width, bmp.Height));
-            return bmp;
+            var scaledWidth = (int) (sourceBMP.Width*scale);
+            var scaledHeight = (int) (sourceBMP.Height*scale);
+            var newBitmap = new Bitmap(scaledWidth, scaledHeight);
+            using (Graphics g = Graphics.FromImage(newBitmap))
+            {
+//                g.InterpolationMode = InterpolationMode.High;
+//                g.CompositingQuality = CompositingQuality.HighQuality;
+//                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.DrawImage(sourceBMP, 0, 0, scaledWidth, scaledHeight);
+            }
+            return newBitmap;
         }
     }
 }
