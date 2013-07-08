@@ -48,30 +48,27 @@ namespace ImageEvolver.Core.Engines
             _candidateGenerator = candidateGenerator;
             _fitnessEvaluator = fitnessEvaluator;
 
-            CurrentBestFitness = double.MaxValue;
-            Generation = 0;
-            Selected = 0;
-
             // initial candidate
-            CurrentBestCandidate = _candidateGenerator.GenerateCandidate();
+            TCandidate startCandidate = _candidateGenerator.GenerateCandidate();
+
+            BestCandidate = new CandidateDetails
+                            {
+                                Candidate = startCandidate,
+                                Fitness = double.MaxValue,
+                            };
         }
 
         public void Dispose() {}
 
         [PublicAPI]
+        public CandidateDetails BestCandidate { get; private set; }
+
+        [PublicAPI]
         public long Candidates { get; set; }
 
-        [PublicAPI]
-        public TCandidate CurrentBestCandidate { get; private set; }
 
         [PublicAPI]
-        public double CurrentBestFitness { get; private set; }
-
-        [PublicAPI]
-        public long Generation { get; private set; }
-
-        [PublicAPI]
-        public long Selected { get; private set; }
+        public long Selected { get; set; }
 
         [PublicAPI]
         public PerformanceDetails GetPerformanceDetails()
@@ -95,25 +92,25 @@ namespace ImageEvolver.Core.Engines
                 try
                 {
                     // generate a new candidate from the single parent (no crossover/recombination)
-                    bool mutated;
-                    _candidateStopwatch.Start();
-                    TCandidate newCandidate = _candidateGenerator.GenerateCandidate(CurrentBestCandidate, out mutated);
-                    _candidateStopwatch.Stop();
+                    CandidateDetails parentCandidateInfo = BestCandidate;
+
+                    var newCandidateInfo = new CandidateDetails();
+
+                    TCandidate newCandidate;
+                    bool mutated = GenerateNewCandidateFromParent(parentCandidateInfo.Candidate, out newCandidate);
+                    newCandidateInfo.Candidate = newCandidate;
 
                     Candidates++;
+
                     if (mutated)
                     {
-                        Generation++;
+                        newCandidateInfo.Generation = parentCandidateInfo.Generation + 1;
 
-                        _fitnessStopwatch.Start();
-                        // evaluate fitness of the new candidate
-                        double newFitness = _fitnessEvaluator.EvaluateFitness(newCandidate);
-                        _fitnessStopwatch.Stop();
+                        newCandidateInfo.Fitness = EvaluateCandidateFitness(newCandidateInfo.Candidate);
 
-                        if (newFitness <= CurrentBestFitness)
+                        if (newCandidateInfo.Fitness <= BestCandidate.Fitness)
                         {
-                            CurrentBestCandidate = newCandidate;
-                            CurrentBestFitness = newFitness;
+                            BestCandidate = newCandidateInfo;
                             Selected++;
                             return true;
                         }
@@ -128,6 +125,43 @@ namespace ImageEvolver.Core.Engines
             }
         }
 
+        private double EvaluateCandidateFitness(TCandidate candidate)
+        {
+            _fitnessStopwatch.Start();
+            try
+            {
+                // evaluate fitness of the new candidate
+                return _fitnessEvaluator.EvaluateFitness(candidate);
+            }
+            finally
+            {
+                _fitnessStopwatch.Stop();
+            }
+        }
+
+        private bool GenerateNewCandidateFromParent(TCandidate parentCandidate, out TCandidate newCandidate)
+        {
+            bool mutated;
+            _candidateStopwatch.Start();
+            newCandidate = _candidateGenerator.GenerateCandidate(parentCandidate, out mutated);
+            _candidateStopwatch.Stop();
+            return mutated;
+        }
+
+        [PublicAPI]
+        public struct CandidateDetails
+        {
+            [PublicAPI]
+            public TCandidate Candidate { get; set; }
+
+            [PublicAPI]
+            public double Fitness { get; set; }
+
+            [PublicAPI]
+            public long Generation { get; set; }
+        }
+
+        [PublicAPI]
         public struct PerformanceDetails
         {
             public double RelativeFitnessEvaluationTime;

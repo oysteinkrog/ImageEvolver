@@ -38,22 +38,23 @@ namespace ImageEvolver.Apps.ConsoleTestApp
                 {
                     if (simpleEvolutionSystem.Engine.Step())
                     {
+                        var bestCandidate = simpleEvolutionSystem.Engine.BestCandidate;
                         BasicEngine<EvoLisaImageCandidate>.PerformanceDetails perfDetails = simpleEvolutionSystem.Engine.GetPerformanceDetails();
 
                         Console.WriteLine("Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Fitness {4:0.000}",
                                           simpleEvolutionSystem.Engine.Selected,
-                                          simpleEvolutionSystem.Engine.Generation,
-                                          simpleEvolutionSystem.Engine.CurrentBestFitness,
+                                          bestCandidate.Generation,
+                                          bestCandidate.Fitness,
                                           perfDetails.RelativeMutationTime,
                                           perfDetails.RelativeFitnessEvaluationTime);
 
                         // print every 100 better-fitness selection
                         if (simpleEvolutionSystem.Engine.Selected%100 == 0)
                         {
-                            simpleEvolutionSystem.SaveBitmap(simpleEvolutionSystem.Engine.CurrentBestCandidate,
+                            simpleEvolutionSystem.SaveBitmap(bestCandidate.Candidate,
                                                              string.Format("MonaLisa-test-{0}-{1}.jpg",
                                                                            simpleEvolutionSystem.Engine.Selected,
-                                                                           simpleEvolutionSystem.Engine.Generation));
+                                                                           bestCandidate.Generation));
                         }
                     }
                 }
