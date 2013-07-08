@@ -21,13 +21,7 @@
 using System;
 using System.Drawing;
 using ImageEvolver.Algorithms.EvoLisa;
-using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core.Engines;
-using ImageEvolver.Core.Fitness;
-using ImageEvolver.Core.Random;
-using ImageEvolver.Fitness.Bitmap;
-using ImageEvolver.Rendering.Bitmap;
-using ImageEvolver.Rendering.OpenGL;
 using ImageEvolver.Resources.Images;
 
 namespace ImageEvolver.Apps.ConsoleTestApp
@@ -37,47 +31,29 @@ namespace ImageEvolver.Apps.ConsoleTestApp
         private static void Main(string[] args)
         {
             Bitmap sourceImage = Images.MonaLisa_EvoLisa200x200;
-            var evoLisaAlgorithmSettings = new EvoLisaAlgorithmSettings();
 
-            using (var basicPseudoRandomProvider = new BasicPseudoRandomProvider(0))
+            using (var simpleEvolutionSystem = new SimpleEvolutionSystem(sourceImage))
             {
-                using (var evoLisaAlgorithm = new EvoLisaAlgorithm(sourceImage, evoLisaAlgorithmSettings, basicPseudoRandomProvider))
+                while (!Console.KeyAvailable)
                 {
-//                    using (var renderer = new GenericFeaturesRendererBitmap(sourceImage.Size))
-                    using (var renderer = new GenericFeaturesRendererOpenGL(sourceImage.Size))
+                    if (simpleEvolutionSystem.Engine.Step())
                     {
-                        using (var bitmapFitnessEvaluator = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.AE))
+                        BasicEngine<EvoLisaImageCandidate>.PerformanceDetails perfDetails = simpleEvolutionSystem.Engine.GetPerformanceDetails();
+
+                        Console.WriteLine("Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Fitness {4:0.000}",
+                                          simpleEvolutionSystem.Engine.Selected,
+                                          simpleEvolutionSystem.Engine.Generation,
+                                          simpleEvolutionSystem.Engine.CurrentBestFitness,
+                                          perfDetails.RelativeMutationTime,
+                                          perfDetails.RelativeFitnessEvaluationTime);
+
+                        // print every 100 better-fitness selection
+                        if (simpleEvolutionSystem.Engine.Selected%100 == 0)
                         {
-                            using (var candidateGenerator = evoLisaAlgorithm.CreateCandidateGenerator())
-                            {
-                                var candidateFitnessEvaluator = new FitnessEvaluatorCandidateBitmap(renderer, bitmapFitnessEvaluator);
-
-                                using (var evolutionEngine = new BasicEngine<EvoLisaImageCandidate>(candidateGenerator, candidateFitnessEvaluator))
-                                {
-                                    while (!Console.KeyAvailable)
-                                    {
-                                        if (evolutionEngine.Step())
-                                        {
-                                            var perfDetails = evolutionEngine.GetPerformanceDetails();
-
-                                            Console.WriteLine("Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Fitness {4:0.000}",
-                                                evolutionEngine.Selected,
-                                                evolutionEngine.Generation,
-                                                evolutionEngine.CurrentBestFitness,
-                                                perfDetails.RelativeMutationTime,
-                                                perfDetails.RelativeFitnessEvaluationTime);
-
-                                            // print every 100 better-fitness selection
-                                            if (evolutionEngine.Selected%100 == 0)
-                                            {
-                                                Bitmap bitmap;
-                                                renderer.Render(evolutionEngine.CurrentBestCandidate, out bitmap);
-                                                bitmap.Save(string.Format("MonaLisa-test-{0}-{1}.jpg", evolutionEngine.Selected, evolutionEngine.Generation));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            simpleEvolutionSystem.SaveBitmap(simpleEvolutionSystem.Engine.CurrentBestCandidate,
+                                                             string.Format("MonaLisa-test-{0}-{1}.jpg",
+                                                                           simpleEvolutionSystem.Engine.Selected,
+                                                                           simpleEvolutionSystem.Engine.Generation));
                         }
                     }
                 }

@@ -111,9 +111,9 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                     Bitmap bitmap;
                     renderer.Render(evolutionEngine.CurrentBestCandidate, out bitmap);
                     bitmap.Save(string.Format("select_{0}_{1}.bmp",
-                                                evolutionEngine.Selected,
-                                                renderer.GetType()
-                                                        .Name));
+                                              evolutionEngine.Selected,
+                                              renderer.GetType()
+                                                      .Name));
                     Assert.AreEqual(334468501, evolutionEngine.CurrentBestFitness);
                     break;
                 }
@@ -122,9 +122,9 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                     Bitmap bitmap;
                     renderer.Render(evolutionEngine.CurrentBestCandidate, out bitmap);
                     bitmap.Save(string.Format("select_{0}_{1}.bmp",
-                                                evolutionEngine.Selected,
-                                                renderer.GetType()
-                                                        .Name));
+                                              evolutionEngine.Selected,
+                                              renderer.GetType()
+                                                      .Name));
                     Assert.AreEqual(224646270, evolutionEngine.CurrentBestFitness);
                     break;
                 }

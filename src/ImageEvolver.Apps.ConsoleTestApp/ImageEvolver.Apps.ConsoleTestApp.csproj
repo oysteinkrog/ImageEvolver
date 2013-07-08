@@ -37,6 +37,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SimpleEvolutionSystem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -67,6 +68,10 @@
     <ProjectReference Include="..\ImageEvolver.Resources.Images\ImageEvolver.Resources.Images.csproj">
       <Project>{5A2E0B1D-DCA4-4AC4-AF67-47AD46690C11}</Project>
       <Name>ImageEvolver.Resources.Images</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\lib\clpp.net\src\Clpp.Core\Clpp.Core.csproj">
+      <Project>{E5DF4771-30A4-4246-9FBC-5D650D4F899D}</Project>
+      <Name>Clpp.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
