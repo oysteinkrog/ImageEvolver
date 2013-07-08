@@ -22,7 +22,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
         private BasicEngine<EvoLisaImageCandidate> _evolutionEngine;
         private FitnessEvaluatorBitmap _fitnessEvalutor;
         private IImageCandidateRenderer<IImageCandidate, Bitmap> _renderer;
-        private FitnessEvaluatorCandidateBitmap _candidateEvaluator;
+        private CandidateFitnessEvaluator<Bitmap> _candidateEvaluator;
 
         public SimpleEvolutionSystem(Bitmap sourceImage)
         {
@@ -34,7 +34,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
             _basicPseudoRandomProvider = new BasicPseudoRandomProvider(0);
             _evoLisaAlgorithm = new EvoLisaAlgorithm(sourceImage, _evoLisaAlgorithmSettings, _basicPseudoRandomProvider);
             _candidateGenerator = _evoLisaAlgorithm.CreateCandidateGenerator();
-            _candidateEvaluator = new FitnessEvaluatorCandidateBitmap(_renderer, _fitnessEvalutor);
+            _candidateEvaluator = new CandidateFitnessEvaluator<Bitmap>(_renderer, _fitnessEvalutor);
             _evolutionEngine = new BasicEngine<EvoLisaImageCandidate>(_candidateGenerator, _candidateEvaluator);
         }
 

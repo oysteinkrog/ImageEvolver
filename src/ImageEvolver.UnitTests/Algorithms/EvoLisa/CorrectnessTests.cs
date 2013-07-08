@@ -57,7 +57,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
             {
                 using (ICandidateGenerator<EvoLisaImageCandidate> candidateGenerator = evoLisaAlgorithm.CreateCandidateGenerator())
                 {
-                    var candidateFitnessEvaluator = new FitnessEvaluatorCandidateBitmap(renderer, bitmapFitnessEvalutor);
+                    var candidateFitnessEvaluator = new CandidateFitnessEvaluator<Bitmap>(renderer, bitmapFitnessEvalutor);
 
                     using (var evolutionEngine = new BasicEngine<EvoLisaImageCandidate>(candidateGenerator, candidateFitnessEvaluator))
                     {

@@ -44,7 +44,6 @@
     <Compile Include="CalculateBitmapSimpleSE.cs" />
     <Compile Include="CalculateBitmapAE.cs" />
     <Compile Include="CalculateBitmapPSNR.cs" />
-    <Compile Include="FitnessEvaluatorCandidateBitmap.cs" />
     <Compile Include="FitnessEvaluatorBitmap.cs" />
     <Compile Include="Pixel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
