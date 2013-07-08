@@ -67,9 +67,12 @@ namespace ImageEvolver.Rendering.OpenGL
                 _glManager.BlendingEnabled = true;
                 _glManager.BlendingSource = BlendingFactorSrc.SrcAlpha;
                 _glManager.BlendingDestination = BlendingFactorDest.OneMinusSrcAlpha;
-
-                _glManager.PushFrameBuffer(_frameBuffer);
             }).Wait();
+        }
+
+        public FrameBuffer FrameBuffer
+        {
+            get { return _frameBuffer; }
         }
 
         public void Render(IImageCandidate candidate, out Texture2D result)
@@ -88,6 +91,8 @@ namespace ImageEvolver.Rendering.OpenGL
         {
             return GLTaskFactory.StartNew(() =>
             {
+                _glManager.PushFrameBuffer(FrameBuffer);
+
                 RenderCandidateInternal(candidate);
 
                 var bitmap = new Bitmap(_size.Width, _size.Height);
@@ -102,18 +107,23 @@ namespace ImageEvolver.Rendering.OpenGL
                 }
 
                 bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+
+                _glManager.PopFrameBuffer();
                 return bitmap;
             });
         }
-
 
         public Task<Texture2D> RenderCandidateToTextureAsync(IImageCandidate candidate)
         {
             return GLTaskFactory.StartNew(() =>
             {
+                _glManager.PushFrameBuffer(FrameBuffer);
+
                 RenderCandidateInternal(candidate);
 
-                return (Texture2D)_frameBuffer.ColorBuffers[0];
+                _glManager.PopFrameBuffer();
+
+                return (Texture2D)FrameBuffer.PrimaryTexture;
             });
         }
 
