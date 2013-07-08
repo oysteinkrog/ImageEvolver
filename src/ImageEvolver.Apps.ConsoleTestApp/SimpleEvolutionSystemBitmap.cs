@@ -15,17 +15,18 @@ namespace ImageEvolver.Apps.ConsoleTestApp
     public class SimpleEvolutionSystemBitmap : IDisposable
     {
         private BasicPseudoRandomProvider _basicPseudoRandomProvider;
+        private CandidateFitnessEvaluator<Bitmap> _candidateEvaluator;
         private ICandidateGenerator<EvoLisaImageCandidate> _candidateGenerator;
         private EvoLisaAlgorithm _evoLisaAlgorithm;
         private EvoLisaAlgorithmSettings _evoLisaAlgorithmSettings;
         private BasicEngine<EvoLisaImageCandidate> _evolutionEngine;
         private FitnessEvaluatorBitmap _fitnessEvalutor;
-        private GenericFeaturesRendererBitmap _renderer;
-        private CandidateFitnessEvaluator<Bitmap> _candidateEvaluator;
+        private IImageCandidateRenderer<IImageCandidate, Bitmap> _renderer;
 
         public SimpleEvolutionSystemBitmap(Bitmap sourceImage)
         {
             _renderer = new GenericFeaturesRendererBitmap(sourceImage.Size);
+            //            _renderer = new GenericFeaturesRendererOpenGL(sourceImage.Size);
             _fitnessEvalutor = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.SimpleSE);
 
             _evoLisaAlgorithmSettings = new EvoLisaAlgorithmSettings();
@@ -67,11 +68,17 @@ namespace ImageEvolver.Apps.ConsoleTestApp
             get { return _evolutionEngine; }
         }
 
-        public void SaveBitmap(EvoLisaImageCandidate currentBestCandidate, string filePath)
+        public Bitmap RenderToBitmap(EvoLisaImageCandidate currentBestCandidate)
         {
             Bitmap bitmap;
             _renderer.Render(currentBestCandidate, out bitmap);
-            bitmap.Save(filePath);
+            return bitmap;
+        }
+
+        public void SaveBitmap(EvoLisaImageCandidate candidate, string filePath)
+        {
+            RenderToBitmap(candidate)
+                .Save(filePath);
         }
     }
 }

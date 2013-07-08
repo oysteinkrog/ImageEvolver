@@ -15,20 +15,22 @@ namespace ImageEvolver.Apps.ConsoleTestApp
     public class SimpleEvolutionSystemOpenCL : IDisposable
     {
         private BasicPseudoRandomProvider _basicPseudoRandomProvider;
+        private CandidateFitnessEvaluator<Texture2D> _candidateEvaluator;
         private ICandidateGenerator<EvoLisaImageCandidate> _candidateGenerator;
         private EvoLisaAlgorithm _evoLisaAlgorithm;
         private EvoLisaAlgorithmSettings _evoLisaAlgorithmSettings;
         private BasicEngine<EvoLisaImageCandidate> _evolutionEngine;
         private FitnessEvaluatorOpenCL _fitnessEvalutor;
         private GenericFeaturesRendererOpenGL _renderer;
-        private CandidateFitnessEvaluator<Texture2D> _candidateEvaluator;
 
         public SimpleEvolutionSystemOpenCL(Bitmap sourceImage)
         {
             //_renderer = new GenericFeaturesRendererBitmap(sourceImage.Size);
             var genericFeaturesRendererOpenGL = new GenericFeaturesRendererOpenGL(sourceImage.Size);
             _renderer = genericFeaturesRendererOpenGL;
-            _fitnessEvalutor = new FitnessEvaluatorOpenCL(genericFeaturesRendererOpenGL.GLTaskFactory, sourceImage, genericFeaturesRendererOpenGL.GraphicsContext);
+            _fitnessEvalutor = new FitnessEvaluatorOpenCL(genericFeaturesRendererOpenGL.GLTaskFactory,
+                                                          sourceImage,
+                                                          genericFeaturesRendererOpenGL.GraphicsContext);
 
             _evoLisaAlgorithmSettings = new EvoLisaAlgorithmSettings();
             _basicPseudoRandomProvider = new BasicPseudoRandomProvider(0);
@@ -69,11 +71,17 @@ namespace ImageEvolver.Apps.ConsoleTestApp
             get { return _evolutionEngine; }
         }
 
-        public void SaveBitmap(EvoLisaImageCandidate currentBestCandidate, string filePath)
+        public Bitmap RenderToBitmap(EvoLisaImageCandidate currentBestCandidate)
         {
             Bitmap bitmap;
             _renderer.Render(currentBestCandidate, out bitmap);
-            bitmap.Save(filePath);
+            return bitmap;
+        }
+
+        public void SaveBitmap(EvoLisaImageCandidate candidate, string filePath)
+        {
+            RenderToBitmap(candidate)
+                .Save(filePath);
         }
     }
 }
