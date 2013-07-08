@@ -23,6 +23,7 @@ using System.Drawing;
 using ImageEvolver.Algorithms.EvoLisa;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core.Engines;
+using ImageEvolver.Core.Fitness;
 using ImageEvolver.Core.Random;
 using ImageEvolver.Fitness.Bitmap;
 using ImageEvolver.Rendering.Bitmap;

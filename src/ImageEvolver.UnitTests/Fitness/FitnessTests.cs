@@ -18,6 +18,7 @@
 
 #endregion
 
+using ImageEvolver.Core.Fitness;
 using ImageEvolver.Fitness.Bitmap;
 using ImageEvolver.Resources.Images;
 using NUnit.Framework;
