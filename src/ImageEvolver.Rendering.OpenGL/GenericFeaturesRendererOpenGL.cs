@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using ImageEvolver.Core;
 using Koeky3D;
 using Koeky3D.BufferHandling;
+using Koeky3D.Textures;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -35,7 +36,7 @@ using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace ImageEvolver.Rendering.OpenGL
 {
-    public sealed class GenericFeaturesRendererOpenGL : RenderingContextBase, IDisposable, IImageCandidateRenderer<IImageCandidate, Bitmap>
+    public sealed class GenericFeaturesRendererOpenGL : RenderingContextBase, IDisposable, IImageCandidateRenderer<IImageCandidate, Bitmap>, IImageCandidateRenderer<IImageCandidate, Texture2D>
     {
         private readonly Size _size;
         private FrameBuffer _frameBuffer;
@@ -68,16 +69,22 @@ namespace ImageEvolver.Rendering.OpenGL
                 _glManager.BlendingDestination = BlendingFactorDest.OneMinusSrcAlpha;
 
                 _glManager.PushFrameBuffer(_frameBuffer);
-            });
+            }).Wait();
         }
-        
+
+        public void Render(IImageCandidate candidate, out Texture2D result)
+        {
+            var renderTask = RenderCandidateToTextureAsync(candidate);
+            result = renderTask.Result;
+        }
+
         public void Render(IImageCandidate candidate, out Bitmap bitmap)
         {
-            var renderTask = RenderCandidateAsync(candidate);
+            var renderTask = RenderCandidateToBitmapAsync(candidate);
             bitmap = renderTask.Result;
         }
 
-        public Task<Bitmap> RenderCandidateAsync(IImageCandidate candidate)
+        public Task<Bitmap> RenderCandidateToBitmapAsync(IImageCandidate candidate)
         {
             return GLTaskFactory.StartNew(() =>
             {
@@ -99,6 +106,16 @@ namespace ImageEvolver.Rendering.OpenGL
             });
         }
 
+
+        public Task<Texture2D> RenderCandidateToTextureAsync(IImageCandidate candidate)
+        {
+            return GLTaskFactory.StartNew(() =>
+            {
+                RenderCandidateInternal(candidate);
+
+                return (Texture2D)_frameBuffer.ColorBuffers[0];
+            });
+        }
 
         private void RenderCandidateInternal(IImageCandidate candidate)
         {
@@ -161,5 +178,6 @@ namespace ImageEvolver.Rendering.OpenGL
 
             vertexArray.ClearResources(true);
         }
+
     }
 }

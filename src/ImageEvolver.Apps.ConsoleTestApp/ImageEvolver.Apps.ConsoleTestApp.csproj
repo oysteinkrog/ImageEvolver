@@ -11,6 +11,8 @@
     <AssemblyName>ImageEvolver.Apps.ConsoleTestApp</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,17 +34,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\OpenTK.1.1.1160.61462\lib\NET40\OpenTK.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SimpleEvolutionSystem.cs" />
+    <Compile Include="SimpleEvolutionSystemBitmap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleEvolutionSystemOpenCL.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ImageEvolver.Algorithms.EvoLisa\ImageEvolver.Algorithms.EvoLisa.csproj">
@@ -56,6 +64,10 @@
     <ProjectReference Include="..\ImageEvolver.Fitness.Bitmap\ImageEvolver.Fitness.Bitmap.csproj">
       <Project>{5E6BD2FF-5274-4590-9BB0-9707D5136DE5}</Project>
       <Name>ImageEvolver.Fitness.Bitmap</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageEvolver.Fitness.OpenCL\ImageEvolver.Fitness.OpenCL.csproj">
+      <Project>{6AB5E866-C25C-4F48-88A3-2CE6F3E12627}</Project>
+      <Name>ImageEvolver.Fitness.OpenCL</Name>
     </ProjectReference>
     <ProjectReference Include="..\ImageEvolver.Rendering.Bitmap\ImageEvolver.Rendering.Bitmap.csproj">
       <Project>{7EDBE367-DA11-4876-85CF-EFF6BB11D8FF}</Project>
@@ -73,8 +85,13 @@
       <Project>{E5DF4771-30A4-4246-9FBC-5D650D4F899D}</Project>
       <Name>Clpp.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\lib\Koeky3d\src\Koeky3D\Koeky3D.csproj">
+      <Project>{01A950ED-F882-407A-90A8-A93D21B43289}</Project>
+      <Name>Koeky3D</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

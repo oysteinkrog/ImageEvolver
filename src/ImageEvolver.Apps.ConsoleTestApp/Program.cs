@@ -32,7 +32,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
         {
             Bitmap sourceImage = Images.MonaLisa_EvoLisa200x200;
 
-            using (var simpleEvolutionSystem = new SimpleEvolutionSystem(sourceImage))
+            using (var simpleEvolutionSystem = new SimpleEvolutionSystemBitmap(sourceImage))
             {
                 while (!Console.KeyAvailable)
                 {

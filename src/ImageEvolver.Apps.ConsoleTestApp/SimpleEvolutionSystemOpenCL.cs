@@ -5,40 +5,40 @@ using ImageEvolver.Algorithms.EvoLisa;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;
 using ImageEvolver.Core.Engines;
-using ImageEvolver.Core.Fitness;
 using ImageEvolver.Core.Random;
-using ImageEvolver.Fitness.Bitmap;
+using ImageEvolver.Fitness.OpenCL;
 using ImageEvolver.Rendering.OpenGL;
+using Koeky3D.Textures;
 
 namespace ImageEvolver.Apps.ConsoleTestApp
 {
-    public class SimpleEvolutionSystem : IDisposable
+    public class SimpleEvolutionSystemOpenCL : IDisposable
     {
         private BasicPseudoRandomProvider _basicPseudoRandomProvider;
-        private SimpleEvolutionSystem _candidateFitnessEvaluator;
         private ICandidateGenerator<EvoLisaImageCandidate> _candidateGenerator;
         private EvoLisaAlgorithm _evoLisaAlgorithm;
         private EvoLisaAlgorithmSettings _evoLisaAlgorithmSettings;
         private BasicEngine<EvoLisaImageCandidate> _evolutionEngine;
-        private FitnessEvaluatorBitmap _fitnessEvalutor;
-        private IImageCandidateRenderer<IImageCandidate, Bitmap> _renderer;
-        private CandidateFitnessEvaluator<Bitmap> _candidateEvaluator;
+        private FitnessEvaluatorOpenCL _fitnessEvalutor;
+        private GenericFeaturesRendererOpenGL _renderer;
+        private CandidateFitnessEvaluator<Texture2D> _candidateEvaluator;
 
-        public SimpleEvolutionSystem(Bitmap sourceImage)
+        public SimpleEvolutionSystemOpenCL(Bitmap sourceImage)
         {
             //_renderer = new GenericFeaturesRendererBitmap(sourceImage.Size);
-            _renderer = new GenericFeaturesRendererOpenGL(sourceImage.Size);
-            _fitnessEvalutor = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.SimpleSE);
+            var genericFeaturesRendererOpenGL = new GenericFeaturesRendererOpenGL(sourceImage.Size);
+            _renderer = genericFeaturesRendererOpenGL;
+            _fitnessEvalutor = new FitnessEvaluatorOpenCL(genericFeaturesRendererOpenGL.GLTaskFactory, sourceImage, genericFeaturesRendererOpenGL.GraphicsContext);
 
             _evoLisaAlgorithmSettings = new EvoLisaAlgorithmSettings();
             _basicPseudoRandomProvider = new BasicPseudoRandomProvider(0);
             _evoLisaAlgorithm = new EvoLisaAlgorithm(sourceImage, _evoLisaAlgorithmSettings, _basicPseudoRandomProvider);
             _candidateGenerator = _evoLisaAlgorithm.CreateCandidateGenerator();
-            _candidateEvaluator = new CandidateFitnessEvaluator<Bitmap>(_renderer, _fitnessEvalutor);
+            _candidateEvaluator = new CandidateFitnessEvaluator<Texture2D>(_renderer, _fitnessEvalutor);
             _evolutionEngine = new BasicEngine<EvoLisaImageCandidate>(_candidateGenerator, _candidateEvaluator);
         }
 
-        ~SimpleEvolutionSystem()
+        ~SimpleEvolutionSystemOpenCL()
         {
             Dispose(false);
         }
@@ -56,11 +56,10 @@ namespace ImageEvolver.Apps.ConsoleTestApp
                 // dispose managed resources
                 DisposeHelper.Dispose(ref _evolutionEngine);
                 DisposeHelper.Dispose(ref _candidateGenerator);
-                DisposeHelper.Dispose(ref _candidateFitnessEvaluator);
                 DisposeHelper.Dispose(ref _evoLisaAlgorithm);
-                DisposeHelper.Dispose(ref _renderer);
-                DisposeHelper.Dispose(ref _renderer);
+                DisposeHelper.Dispose(ref _basicPseudoRandomProvider);
                 DisposeHelper.Dispose(ref _fitnessEvalutor);
+                DisposeHelper.Dispose(ref _renderer);
             }
             // free native resources if there are any.
         }
@@ -68,16 +67,6 @@ namespace ImageEvolver.Apps.ConsoleTestApp
         public BasicEngine<EvoLisaImageCandidate> Engine
         {
             get { return _evolutionEngine; }
-        }
-
-        public FitnessEvaluatorBitmap FitnessEvalutor
-        {
-            get { return _fitnessEvalutor; }
-        }
-
-        public IImageCandidateRenderer<IImageCandidate, Bitmap> Renderer
-        {
-            get { return _renderer; }
         }
 
         public void SaveBitmap(EvoLisaImageCandidate currentBestCandidate, string filePath)
