@@ -35,7 +35,7 @@ namespace ImageEvolver.Fitness.OpenCL
         private readonly ComputeImage2D _sourceImage;
         private ComputeKernel _errorKernel;
         private ComputeProgram _errorProgram;
-        private ComputeBuffer<uint> _errorSquaredOutputBuffer;
+        private ComputeBuffer<ulong> _errorSquaredOutputBuffer;
 
         public CalculateImageDifferenceError(ComputeContext computeContext,
                                              ComputeDevice computeDevice,
@@ -77,7 +77,7 @@ namespace ImageEvolver.Fitness.OpenCL
 
             _errorKernel = _errorProgram.CreateKernel("kernel__error_squared");
 
-            _errorSquaredOutputBuffer = new ComputeBuffer<uint>(computeContext, ComputeMemoryFlags.ReadWrite, _sourceImage.Width*_sourceImage.Height);
+            _errorSquaredOutputBuffer = new ComputeBuffer<ulong>(computeContext, ComputeMemoryFlags.ReadWrite, _sourceImage.Width*_sourceImage.Height);
 
             _errorKernel.SetMemoryArgument(1, _sourceImage);
             _errorKernel.SetMemoryArgument(2, _errorSquaredOutputBuffer);
@@ -100,7 +100,7 @@ namespace ImageEvolver.Fitness.OpenCL
             // get rid of unmanaged resources
         }
 
-        public ComputeBuffer<uint> ErrorSquaredOutputBuffer
+        public ComputeBuffer<ulong> ErrorSquaredOutputBuffer
         {
             get { return _errorSquaredOutputBuffer; }
         }

@@ -1,4 +1,4 @@
-﻿#define T_out uint
+﻿#define T_out ulong
 
 __kernel
 	void kernel__error_squared(
@@ -21,5 +21,6 @@ __kernel
 	// r_d^2 + g_d^2 + b_d^2
 	T_out error = pixel_d.x*pixel_d.x + pixel_d.y*pixel_d.y + pixel_d.z*pixel_d.z;
 
+    // write back to output buffer, index is (x + y * width)
 	errorOutputBuffer[pos.x + pos.y*get_global_size(0)] = error;
 }

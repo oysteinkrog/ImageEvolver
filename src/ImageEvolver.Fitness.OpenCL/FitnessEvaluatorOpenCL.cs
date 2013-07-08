@@ -39,7 +39,7 @@ namespace ImageEvolver.Fitness.OpenCL
         private readonly TaskFactory _taskFactory;
         private ClppContext _clppContext;
 
-        private ClppScanGPU<uint> _clppScanSum;
+        private ClppScanGPU<ulong> _clppScanSum;
 
         private ComputeCommandQueue _computeCommandQueue;
 
@@ -84,7 +84,7 @@ namespace ImageEvolver.Fitness.OpenCL
 
                 _clppContext = new ClppContext(device, _computeContext, _computeCommandQueue);
 
-                _clppScanSum = new ClppScanGPU<uint>(_clppContext, _size.Width*_size.Height);
+                _clppScanSum = new ClppScanGPU<ulong>(_clppContext, _size.Width*_size.Height);
 
                 _sourceBitmapTexture = new Texture2D(_sourceBitmap, false);
                 _sourceBitmapComputeImage = ComputeImage2D.CreateFromGLTexture2D(_computeContext,
@@ -135,7 +135,7 @@ namespace ImageEvolver.Fitness.OpenCL
             GL.Flush();
             GL.Finish();
 
-            uint fitnessErrorSum = 0;
+            ulong fitnessErrorSum = 0;
 
             using (
                 ComputeImage2D computeImage = ComputeImage2D.CreateFromGLTexture2D(_computeContext,
@@ -154,22 +154,24 @@ namespace ImageEvolver.Fitness.OpenCL
 
                 _errorCalc.ComputeDifference(computeImage);
 
-                var val = new uint[_size.Width * _size.Height];
+                var val = new ulong[_size.Width * _size.Height];
                 _computeCommandQueue.ReadFromBuffer(_errorCalc.ErrorSquaredOutputBuffer, ref val, true, null);
-
+                
                 _clppScanSum.PushCLDatas(_errorCalc.ErrorSquaredOutputBuffer);
                 _clppScanSum.Scan();
 
                 _computeCommandQueue.ReadFromBuffer(_errorCalc.ErrorSquaredOutputBuffer, ref val, true, null);
                 unsafe
                 {
+                    ulong lastElement = 0;
                     // read last element... which is total sum
                     _clppContext.CommandQueue.Read(_errorCalc.ErrorSquaredOutputBuffer,
                                                    true,
                                                    _errorCalc.ErrorSquaredOutputBuffer.Count - 1,
                                                    1,
-                                                   new IntPtr(&fitnessErrorSum),
+                                                   new IntPtr(&lastElement),
                                                    null);
+                    fitnessErrorSum = lastElement;
                 }
 
                 _computeCommandQueue.ReleaseGLObjects(computeMemories, null);
