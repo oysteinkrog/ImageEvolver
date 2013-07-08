@@ -36,12 +36,14 @@ namespace ImageEvolver.UnitTests.Rendering
         public void SinglePolygonTest_Bitmap()
         {
             var size = new Size(400, 400);
-            var candidate = new TestCandidate(size);
-            using (var renderer = new GenericFeaturesRendererBitmap(size))
+            using (var renderBuffer = new Bitmap(size.Width, size.Height))
             {
-                Bitmap bitmap;
-                renderer.Render(candidate, out bitmap);
-                bitmap.Save(@"SinglePolygonTest_Bitmap.bmp");
+                var candidate = new TestCandidate(size);
+                using (var renderer = new GenericFeaturesRendererBitmap(size))
+                {
+                    renderer.Render(candidate, renderBuffer);
+                    renderBuffer.Save(@"SinglePolygonTest_Bitmap.bmp");
+                }
             }
         }
 
@@ -49,12 +51,14 @@ namespace ImageEvolver.UnitTests.Rendering
         public void SinglePolygonTest_OpenGL()
         {
             var size = new Size(400, 400);
-            var candidate = new TestCandidate(size);
-            using (var renderer = new GenericFeaturesRendererOpenGL(size))
+            using (var renderBuffer = new Bitmap(size.Width, size.Height))
             {
-                Bitmap bitmap;
-                renderer.Render(candidate, out bitmap);
-                bitmap.Save(@"SinglePolygonTest_OpenGL.bmp");
+                var candidate = new TestCandidate(size);
+                using (var renderer = new GenericFeaturesRendererOpenGL(size))
+                {
+                    renderer.Render(candidate, renderBuffer);
+                    renderBuffer.Save(@"SinglePolygonTest_OpenGL.bmp");
+                }
             }
         }
     }

@@ -26,6 +26,7 @@ using ImageEvolver.Fitness.Bitmap;
 using ImageEvolver.Fitness.OpenCL;
 using ImageEvolver.Rendering.OpenGL;
 using ImageEvolver.Resources.Images;
+using Koeky3D.BufferHandling;
 using Koeky3D.Textures;
 using NUnit.Framework;
 
@@ -68,10 +69,11 @@ namespace ImageEvolver.UnitTests.Fitness
 
             using (var openGlContext = new RenderingContextBase())
             {
-                Texture2D imageBTexture = null;
+                FrameBuffer imageBFrameBuffer = null;
                 openGlContext.GLTaskFactory.StartNew(() =>
                 {
-                    imageBTexture = new Texture2D(imageB, false);
+                    var imageBTexture = new Texture2D(imageB, false);
+                    imageBFrameBuffer = new FrameBuffer(imageBTexture.Width, imageBTexture.Width, new Texture[] {imageBTexture}, null);
                 })
                              .Wait();
                 using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(openGlContext.GLTaskFactory, imageA, openGlContext.GraphicsContext))
@@ -79,13 +81,13 @@ namespace ImageEvolver.UnitTests.Fitness
                     // warmup
                     for (int i = 0; i < 100; i++)
                     {
-                        double fitness = fitnessEvaluator.EvaluateFitness(imageBTexture);
+                        double fitness = fitnessEvaluator.EvaluateFitness(imageBFrameBuffer);
                     }
 
                     sw.Start();
                     for (int i = 0; i < times; i++)
                     {
-                        double fitness = fitnessEvaluator.EvaluateFitness(imageBTexture);
+                        double fitness = fitnessEvaluator.EvaluateFitness(imageBFrameBuffer);
                     }
                     sw.Stop();
                 }

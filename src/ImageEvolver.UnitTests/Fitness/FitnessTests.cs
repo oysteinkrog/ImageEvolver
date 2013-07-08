@@ -25,6 +25,7 @@ using ImageEvolver.Fitness.Bitmap;
 using ImageEvolver.Fitness.OpenCL;
 using ImageEvolver.Rendering.OpenGL;
 using ImageEvolver.Resources.Images;
+using Koeky3D.BufferHandling;
 using Koeky3D.Textures;
 using NUnit.Framework;
 
@@ -70,15 +71,19 @@ namespace ImageEvolver.UnitTests.Fitness
             Bitmap imageB = Images.MonaLisa_EvoLisa200x200_TestApproximation;
             using (var openGlContext = new RenderingContextBase())
             {
-                Texture2D approxImageTexture = null;
+                FrameBuffer imageBFrameBuffer = null;
                 openGlContext.GLTaskFactory.StartNew(() =>
                 {
-                    approxImageTexture = new Texture2D(imageB, false);
+                    var imageBTexture = new Texture2D(imageB, false);
+                    imageBFrameBuffer = new FrameBuffer(imageBTexture.Width,
+                                                        imageBTexture.Width,
+                                                        new Texture[] {imageBTexture},
+                                                        null);
                 })
                              .Wait();
                 using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(openGlContext.GLTaskFactory, imageA, openGlContext.GraphicsContext))
                 {
-                    double fitness = fitnessEvaluator.EvaluateFitness(approxImageTexture);
+                    double fitness = fitnessEvaluator.EvaluateFitness(imageBFrameBuffer);
                     Assert.AreEqual(46865993.0, fitness);
                 }
             }

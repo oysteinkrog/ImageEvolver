@@ -36,13 +36,13 @@ using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace ImageEvolver.Rendering.OpenGL
 {
-    public sealed class GenericFeaturesRendererOpenGL : RenderingContextBase, IDisposable, IImageCandidateRenderer<IImageCandidate, Bitmap>, IImageCandidateRenderer<IImageCandidate, Texture2D>
+    public sealed class GenericFeaturesRendererOpenGL : RenderingContextBase, IDisposable, IImageCandidateRenderer<IImageCandidate, Bitmap>, IImageCandidateRenderer<IImageCandidate, FrameBuffer>
     {
         private readonly Size _size;
-        private FrameBuffer _frameBuffer;
         private GLManager _glManager;
         private RenderOptions _renderOptions;
         private RenderingTechnique _technique;
+        private FrameBuffer _internalFrameBuffer;
 
         public GenericFeaturesRendererOpenGL(Size size)
         {
@@ -52,8 +52,8 @@ namespace ImageEvolver.Rendering.OpenGL
             {
                 _renderOptions = new RenderOptions(_size.Width, _size.Height, Window.WindowState, VSyncMode.Off);
                 _glManager = new GLManager(_renderOptions);
-                _frameBuffer = new FrameBuffer(_size.Width, _size.Height, 1, true);
                 _technique = new RenderingTechnique();
+                _internalFrameBuffer = new FrameBuffer(size.Width, size.Height, 1, false);
                 if (!_technique.Initialise())
                 {
                     throw new Exception("Technique failed to initialize");
@@ -70,60 +70,49 @@ namespace ImageEvolver.Rendering.OpenGL
             }).Wait();
         }
 
-        public FrameBuffer FrameBuffer
+        public void Render(IImageCandidate candidate, FrameBuffer outputBuffer)
         {
-            get { return _frameBuffer; }
+            RenderCandidateToTextureAsync(candidate, outputBuffer).Wait();
         }
 
-        public void Render(IImageCandidate candidate, out Texture2D result)
+        public void Render(IImageCandidate candidate, Bitmap outputBuffer)
         {
-            var renderTask = RenderCandidateToTextureAsync(candidate);
-            result = renderTask.Result;
+            RenderCandidateToBitmapAsync(candidate, outputBuffer).Wait();
         }
 
-        public void Render(IImageCandidate candidate, out Bitmap bitmap)
-        {
-            var renderTask = RenderCandidateToBitmapAsync(candidate);
-            bitmap = renderTask.Result;
-        }
-
-        public Task<Bitmap> RenderCandidateToBitmapAsync(IImageCandidate candidate)
+        public Task RenderCandidateToBitmapAsync(IImageCandidate candidate, Bitmap outputBuffer)
         {
             return GLTaskFactory.StartNew(() =>
             {
-                _glManager.PushFrameBuffer(FrameBuffer);
+                _glManager.PushFrameBuffer(_internalFrameBuffer);
 
                 RenderCandidateInternal(candidate);
 
-                var bitmap = new Bitmap(_size.Width, _size.Height);
-                var data = bitmap.LockBits(new Rectangle(0, 0, _size.Width, _size.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+                var data = outputBuffer.LockBits(new Rectangle(0, 0, _size.Width, _size.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
                 try
                 {
                     GL.ReadPixels(0, 0, _size.Width, _size.Height, OpenTK.Graphics.OpenGL.PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
                 }
                 finally
                 {
-                    bitmap.UnlockBits(data);
+                    outputBuffer.UnlockBits(data);
                 }
 
-                bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+//                outputBuffer.RotateFlip(RotateFlipType.RotateNoneFlipY);
 
                 _glManager.PopFrameBuffer();
-                return bitmap;
             });
         }
 
-        public Task<Texture2D> RenderCandidateToTextureAsync(IImageCandidate candidate)
+        public Task RenderCandidateToTextureAsync(IImageCandidate candidate, FrameBuffer outputBuffer)
         {
             return GLTaskFactory.StartNew(() =>
             {
-                _glManager.PushFrameBuffer(FrameBuffer);
+                _glManager.PushFrameBuffer(outputBuffer);
 
                 RenderCandidateInternal(candidate);
 
                 _glManager.PopFrameBuffer();
-
-                return (Texture2D)FrameBuffer.PrimaryTexture;
             });
         }
 

@@ -28,13 +28,14 @@ using Clpp.Core;
 using Clpp.Core.Scan;
 using Clpp.Core.Utilities;
 using ImageEvolver.Core.Fitness;
+using Koeky3D.BufferHandling;
 using Koeky3D.Textures;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
 namespace ImageEvolver.Fitness.OpenCL
 {
-    public sealed class FitnessEvaluatorOpenCL : IFitnessEvaluator<Texture2D>, IDisposable
+    public sealed class FitnessEvaluatorOpenCL : IFitnessEvaluator<FrameBuffer>, IDisposable
     {
         private readonly TaskFactory _taskFactory;
         private ClppContext _clppContext;
@@ -123,13 +124,13 @@ namespace ImageEvolver.Fitness.OpenCL
             // get rid of unmanaged resources
         }
 
-        public double EvaluateFitness(Texture2D inputTexture)
+        public double EvaluateFitness(FrameBuffer candidate)
         {
-            return _taskFactory.StartNew(() => EvaluateFitnessInternal(inputTexture))
+            return _taskFactory.StartNew(() => EvaluateFitnessInternal(candidate))
                                .Result;
         }
 
-        private double EvaluateFitnessInternal(Texture2D inputTexture)
+        private double EvaluateFitnessInternal(FrameBuffer inputFrameBuffer)
         {
             // flush opengl operations
             GL.Flush();
@@ -140,9 +141,9 @@ namespace ImageEvolver.Fitness.OpenCL
             using (
                 ComputeImage2D computeImage = ComputeImage2D.CreateFromGLTexture2D(_computeContext,
                                                                                    ComputeMemoryFlags.ReadOnly,
-                                                                                   (int) inputTexture.TextureTarget,
+                                                                                   (int) inputFrameBuffer.PrimaryTexture.TextureTarget,
                                                                                    0,
-                                                                                   inputTexture.TextureId))
+                                                                                   inputFrameBuffer.PrimaryTexture.TextureId))
             {
                 var computeMemories = new Collection<ComputeMemory>(new List<ComputeMemory>
                                                                     {

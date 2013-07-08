@@ -6,18 +6,19 @@ namespace ImageEvolver.Core
     {
         private readonly IImageCandidateRenderer<IImageCandidate, T> _renderer;
         private readonly IFitnessEvaluator<T> _bitmapFitnessEvalutor;
+        private readonly T _renderBuffer;
 
-        public CandidateFitnessEvaluator(IImageCandidateRenderer<IImageCandidate, T> renderer, IFitnessEvaluator<T> bitmapFitnessEvalutor)
+        public CandidateFitnessEvaluator(IImageCandidateRenderer<IImageCandidate, T> renderer, IFitnessEvaluator<T> bitmapFitnessEvalutor, T renderBuffer)
         {
             _renderer = renderer;
             _bitmapFitnessEvalutor = bitmapFitnessEvalutor;
+            _renderBuffer = renderBuffer;
         }
 
         public double EvaluateFitness(IImageCandidate candidate)
         {
-            T output;
-            _renderer.Render(candidate, out output);
-            return _bitmapFitnessEvalutor.EvaluateFitness(output);
+            _renderer.Render(candidate, _renderBuffer);
+            return _bitmapFitnessEvalutor.EvaluateFitness(_renderBuffer);
         }
     }
 }
