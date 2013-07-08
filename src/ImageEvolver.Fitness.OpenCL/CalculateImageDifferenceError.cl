@@ -1,32 +1,25 @@
-﻿__kernel
-    void kernel__error_squared(
-    __read_only image2d_t imageA,
-    __read_only image2d_t imageB,
-    __global uint* errorOutputBuffer
-    )
+﻿#define T_out uint
+
+__kernel
+	void kernel__error_squared(
+	__read_only image2d_t imageA,
+	__read_only image2d_t imageB,
+	__global T_out* errorOutputBuffer
+	)
 {
-    const int2 pos = { get_global_id(0), get_global_id(1) };
+	const int2 pos = { get_global_id(0), get_global_id(1) };
 
-    const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | //Natural coordinates
-        CLK_ADDRESS_CLAMP |           //Clamp to zeros
-        CLK_FILTER_NEAREST;           //Don't interpolate
+	const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | //Natural coordinates
+		CLK_ADDRESS_CLAMP |           //Clamp to zeros
+		CLK_FILTER_NEAREST;           //Don't interpolate
 
-    float4 pixelA = read_imagef(imageA, sampler, pos);
-    float4 pixelB = read_imagef(imageB, sampler, pos);
+	float3 pixelA = read_imagef(imageA, sampler, pos).xyz;
+	float3 pixelB = read_imagef(imageB, sampler, pos).xyz;
 
-    pixelA *= 255.0f;
-    pixelB *= 255.0f;
+	float3 pixel_d = 255.0 * (pixelA - pixelB);
 
-    float r_d = pixelA.x - pixelB.x;
-    float g_d = pixelA.y - pixelB.y;
-    float b_d = pixelA.z - pixelB.z;
-
-    // r_d^2 + g_d^2 + b_d^2
-    float r_d_2 = r_d * r_d;
-    float g_d_2 = g_d * g_d;
-    float b_d_2 = b_d * b_d;
-
-    float error = r_d_2 + g_d_2 + b_d_2;
+	// r_d^2 + g_d^2 + b_d^2
+	T_out error = pixel_d.x*pixel_d.x + pixel_d.y*pixel_d.y + pixel_d.z*pixel_d.z;
 
 	errorOutputBuffer[pos.x + pos.y*get_global_size(0)] = error;
 }
