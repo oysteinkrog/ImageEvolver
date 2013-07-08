@@ -34,7 +34,7 @@ namespace ImageEvolver.UnitTests.Fitness
     public class FitnessTests
     {
         [Test]
-        public static void TestFitnessWithEvaluatorBitmap([Values(FitnessEquation.SimpleSE, FitnessEquation.MSE)] FitnessEquation fitnessEquation)
+        public static void TestFitnessWithEvaluatorBitmap([Values(FitnessEquation.SimpleSE, FitnessEquation.MSE, FitnessEquation.PSNR)] FitnessEquation fitnessEquation)
         {
             Bitmap imageA = Images.MonaLisa_EvoLisa200x200;
             Bitmap imageB = Images.MonaLisa_EvoLisa200x200_TestApproximation;
@@ -50,11 +50,13 @@ namespace ImageEvolver.UnitTests.Fitness
                     case FitnessEquation.MSE:
                         Assert.AreEqual(390.54994166666665d, fitness);
                         break;
+                    case FitnessEquation.PSNR:
+                        Assert.AreEqual(35.172420722306192d, fitness);
+                        break;
                     case FitnessEquation.AE:
                     case FitnessEquation.MAE:
                     case FitnessEquation.RMSD:
                     case FitnessEquation.NRMSD:
-                    case FitnessEquation.PSNR:
                     default:
                         throw new ArgumentOutOfRangeException("fitnessEquation");
                 }
