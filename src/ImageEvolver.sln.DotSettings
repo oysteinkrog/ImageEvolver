@@ -330,10 +330,13 @@ II.2.12 &lt;HandlesEvent /&gt;&#xD;
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GDI/@EntryIndexedValue">GDI</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GL/@EntryIndexedValue">GL</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=ID/@EntryIndexedValue">ID</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=MAE/@EntryIndexedValue">MAE</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=MD/@EntryIndexedValue">MD</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=MSE/@EntryIndexedValue">MSE</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=NRMSD/@EntryIndexedValue">NRMSD</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=PSNR/@EntryIndexedValue">PSNR</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=RMAE/@EntryIndexedValue">RMAE</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=RMSD/@EntryIndexedValue">RMSD</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SE/@EntryIndexedValue">SE</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=VM/@EntryIndexedValue">VM</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/EventHandlerPatternLong/@EntryValue">$object$_On$event$</s:String>
