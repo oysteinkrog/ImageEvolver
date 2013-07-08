@@ -20,7 +20,10 @@
 
 using ImageEvolver.Core.Fitness;
 using ImageEvolver.Fitness.Bitmap;
+using ImageEvolver.Fitness.OpenCL;
+using ImageEvolver.Rendering.OpenGL;
 using ImageEvolver.Resources.Images;
+using Koeky3D.Textures;
 using NUnit.Framework;
 
 namespace ImageEvolver.UnitTests.Fitness
@@ -36,6 +39,25 @@ namespace ImageEvolver.UnitTests.Fitness
                 double fitness = fitnessEvaluator.EvaluateFitness(Images.MonaLisa_EvoLisa200x200_TestApproximation);
 
                 Assert.AreEqual(46865993.0, fitness);
+            }
+        }
+
+        [Test]
+        public static void TestFitnessWithEvaluatorOpenCL()
+        {
+            using (var openGlContext = new RenderingContextBase())
+            {
+                Texture2D approxImageTexture = null;
+                openGlContext.GLTaskFactory.StartNew(() =>
+                {
+                    approxImageTexture = new Texture2D(Images.MonaLisa_EvoLisa200x200_TestApproximation, false);
+                })
+                             .Wait();
+                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(openGlContext.GLTaskFactory, Images.MonaLisa_EvoLisa200x200, openGlContext.GraphicsContext))
+                {
+                    double fitness = fitnessEvaluator.EvaluateFitness(approxImageTexture);
+                    Assert.AreEqual(46865993.0, fitness);
+                }
             }
         }
     }

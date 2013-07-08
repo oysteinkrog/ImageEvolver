@@ -27,13 +27,13 @@ namespace ImageEvolver.Rendering.OpenGL
 {
     public class RenderingContextBase : IDisposable
     {
-        protected readonly TaskFactory GLTaskFactory;
-        protected GraphicsContext GraphicsContext;
+        public readonly TaskFactory GLTaskFactory;
+        public GraphicsContext GraphicsContext;
         protected GraphicsMode GraphicsMode;
         protected NativeWindow Window;
         private bool _disposed;
 
-        protected RenderingContextBase()
+        public RenderingContextBase()
         {
             GLTaskFactory = new TaskFactory(new SingleThreadTaskScheduler());
 
