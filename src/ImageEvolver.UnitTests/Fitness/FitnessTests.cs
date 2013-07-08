@@ -18,6 +18,7 @@
 
 #endregion
 
+using System.Drawing;
 using ImageEvolver.Core.Fitness;
 using ImageEvolver.Fitness.Bitmap;
 using ImageEvolver.Fitness.OpenCL;
@@ -34,9 +35,11 @@ namespace ImageEvolver.UnitTests.Fitness
         [Test]
         public static void TestFitnessWithEvaluatorBitmap()
         {
-            using (var fitnessEvaluator = new FitnessEvaluatorBitmap(Images.MonaLisa_EvoLisa200x200, FitnessEquation.SimpleSE))
+            Bitmap imageA = Images.MonaLisa_EvoLisa200x200;
+            Bitmap imageB = Images.MonaLisa_EvoLisa200x200_TestApproximation;
+            using (var fitnessEvaluator = new FitnessEvaluatorBitmap(imageA, FitnessEquation.SimpleSE))
             {
-                double fitness = fitnessEvaluator.EvaluateFitness(Images.MonaLisa_EvoLisa200x200_TestApproximation);
+                double fitness = fitnessEvaluator.EvaluateFitness(imageB);
 
                 Assert.AreEqual(46865993.0, fitness);
             }
@@ -45,15 +48,17 @@ namespace ImageEvolver.UnitTests.Fitness
         [Test]
         public static void TestFitnessWithEvaluatorOpenCL()
         {
+            Bitmap imageA = Images.MonaLisa_EvoLisa200x200;
+            Bitmap imageB = Images.MonaLisa_EvoLisa200x200_TestApproximation;
             using (var openGlContext = new RenderingContextBase())
             {
                 Texture2D approxImageTexture = null;
                 openGlContext.GLTaskFactory.StartNew(() =>
                 {
-                    approxImageTexture = new Texture2D(Images.MonaLisa_EvoLisa200x200_TestApproximation, false);
+                    approxImageTexture = new Texture2D(imageB, false);
                 })
                              .Wait();
-                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(openGlContext.GLTaskFactory, Images.MonaLisa_EvoLisa200x200, openGlContext.GraphicsContext))
+                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(openGlContext.GLTaskFactory, imageA, openGlContext.GraphicsContext))
                 {
                     double fitness = fitnessEvaluator.EvaluateFitness(approxImageTexture);
                     Assert.AreEqual(46865993.0, fitness);
