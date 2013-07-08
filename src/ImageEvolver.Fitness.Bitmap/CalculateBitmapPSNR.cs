@@ -28,9 +28,11 @@ namespace ImageEvolver.Fitness.Bitmap
         {
             // mean square error
             var mse = CalculateBitmapMSE.EvaluateFitness(sourceImagePixelCache, bitmap);
-            
+
+            const int max = 255;
+
             // Calculate PSNR (Peak Signal to noise ratio).
-            var psnr = 10*Math.Log10((255.0*255.0)/Math.Sqrt(mse));
+            var psnr = 10 * Math.Log10((max * max) / Math.Sqrt(mse));
             
             return psnr;
         }
