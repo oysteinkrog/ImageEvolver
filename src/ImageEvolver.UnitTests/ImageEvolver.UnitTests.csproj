@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1E4ADD15-441E-4B33-B649-63A7BE206800}</ProjectGuid>
+    <ProjectGuid>{9D01CBCF-ACEF-4873-B3F4-D86544D5F3C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageEvolver.UnitTests.Algorithms.EvoLisa</RootNamespace>
-    <AssemblyName>ImageEvolver.UnitTests.Algorithms.EvoLisa</AssemblyName>
+    <RootNamespace>ImageEvolver.UnitTests</RootNamespace>
+    <AssemblyName>ImageEvolver.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -38,10 +38,16 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CorrectnessTests.cs" />
+    <Compile Include="Algorithms\EvoLisa\CorrectnessTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rendering\RendererTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -54,6 +60,10 @@
     <ProjectReference Include="..\ImageEvolver.Core\ImageEvolver.Core.csproj">
       <Project>{6B38160E-58D5-4EDF-9C68-BE35C36FA315}</Project>
       <Name>ImageEvolver.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageEvolver.Features\ImageEvolver.Features.csproj">
+      <Project>{1FD19629-6857-4B79-9419-A35A244B4EF1}</Project>
+      <Name>ImageEvolver.Features</Name>
     </ProjectReference>
     <ProjectReference Include="..\ImageEvolver.Fitness.Bitmap\ImageEvolver.Fitness.Bitmap.csproj">
       <Project>{5E6BD2FF-5274-4590-9BB0-9707D5136DE5}</Project>

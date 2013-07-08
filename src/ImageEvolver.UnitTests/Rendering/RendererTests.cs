@@ -27,23 +27,11 @@ using ImageEvolver.Rendering.Bitmap;
 using ImageEvolver.Rendering.OpenGL;
 using NUnit.Framework;
 
-namespace ImageEvolver.UnitTests.Renderers
+namespace ImageEvolver.UnitTests.Rendering
 {
     [TestFixture]
     public class RendererTests
     {
-        [Test]
-        public void SinglePolygonTest_OpenGL()
-        {
-            var size = new Size(400, 400);
-            var candidate = new TestCandidate(size);
-            using (var renderer = new GenericFeaturesRendererOpenGL(size))
-            {
-                renderer.Render(candidate)
-                        .Save(@"SinglePolygonTest_OpenGL.bmp");
-            }
-        }
-
         [Test]
         public void SinglePolygonTest_Bitmap()
         {
@@ -53,6 +41,18 @@ namespace ImageEvolver.UnitTests.Renderers
             {
                 renderer.Render(candidate)
                         .Save(@"SinglePolygonTest_Bitmap.bmp");
+            }
+        }
+
+        [Test]
+        public void SinglePolygonTest_OpenGL()
+        {
+            var size = new Size(400, 400);
+            var candidate = new TestCandidate(size);
+            using (var renderer = new GenericFeaturesRendererOpenGL(size))
+            {
+                renderer.Render(candidate)
+                        .Save(@"SinglePolygonTest_OpenGL.bmp");
             }
         }
     }
@@ -68,7 +68,6 @@ namespace ImageEvolver.UnitTests.Renderers
         {
             get
             {
-
                 yield return new PolygonFeature(new List<PointFeature>
                                                 {
                                                     new PointFeature(100, 20),
@@ -99,10 +98,7 @@ namespace ImageEvolver.UnitTests.Renderers
 
         public Color BackgroundColor
         {
-            get
-            {
-                return Color.White;
-            }
+            get { return Color.White; }
         }
 
         public Size Size { get; set; }

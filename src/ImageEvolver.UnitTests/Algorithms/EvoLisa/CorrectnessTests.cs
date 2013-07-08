@@ -40,8 +40,8 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
         ///     Constants in the code were collected from the original using a random provider with a known seed (0)
         /// </summary>
         private static void TestEvoLisaWithRenderer(IImageCandidateRenderer<IImageCandidate, Bitmap> renderer,
-                                                      Bitmap sourceImage,
-                                                      BasicPseudoRandomProvider basicPseudoRandomProvider)
+                                                    Bitmap sourceImage,
+                                                    BasicPseudoRandomProvider basicPseudoRandomProvider)
         {
             var evoLisaAlgorithmSettings = new EvoLisaAlgorithmSettings();
             using (var evoLisaAlgorithm = new EvoLisaAlgorithm(sourceImage, evoLisaAlgorithmSettings, basicPseudoRandomProvider))
@@ -54,7 +54,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
         {
             using (var bitmapFitnessEvalutor = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.SimpleSE))
             {
-                using (var candidateGenerator = evoLisaAlgorithm.CreateCandidateGenerator())
+                using (ICandidateGenerator<EvoLisaImageCandidate> candidateGenerator = evoLisaAlgorithm.CreateCandidateGenerator())
                 {
                     var candidateFitnessEvaluator = new FitnessEvaluatorCandidateBitmap(renderer, bitmapFitnessEvalutor);
 
@@ -80,8 +80,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
             }
         }
 
-        private static bool CheckEngineResults(BasicEngine<EvoLisaImageCandidate> evolutionEngine,
-                                               IImageCandidateRenderer<IImageCandidate, Bitmap> renderer)
+        private static bool CheckEngineResults(BasicEngine<EvoLisaImageCandidate> evolutionEngine, IImageCandidateRenderer<IImageCandidate, Bitmap> renderer)
         {
             switch (evolutionEngine.Selected)
             {
@@ -142,7 +141,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
         [Test]
         public void TestBitmapRenderer()
         {
-            var sourceImage = Images.MonaLisa_EvoLisa200x200;
+            Bitmap sourceImage = Images.MonaLisa_EvoLisa200x200;
             using (var renderer = new GenericFeaturesRendererBitmap(sourceImage.Size))
             {
                 using (var basicPseudoRandomProvider = new BasicPseudoRandomProvider(0))
@@ -155,7 +154,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
         [Test]
         public void TestOpenGLRenderer()
         {
-            var sourceImage = Images.MonaLisa_EvoLisa200x200;
+            Bitmap sourceImage = Images.MonaLisa_EvoLisa200x200;
             using (var renderer = new GenericFeaturesRendererOpenGL(sourceImage.Size))
             {
                 using (var basicPseudoRandomProvider = new BasicPseudoRandomProvider(0))
