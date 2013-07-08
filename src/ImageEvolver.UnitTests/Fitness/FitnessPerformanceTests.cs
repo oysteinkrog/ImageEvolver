@@ -36,15 +36,17 @@ namespace ImageEvolver.UnitTests.Fitness
     public class FitnessPerformanceTests
     {
         [Test]
-        public static void TestPerformanceBitmap([Values(FitnessEquation.AE, FitnessEquation.SimpleSE, FitnessEquation.MSE)] FitnessEquation fitnessEquation, [Values(1000)] int times)
+        public static void TestPerformanceBitmap([Values(FitnessEquation.AE, FitnessEquation.SimpleSE, FitnessEquation.MSE)] FitnessEquation fitnessEquation,
+                                                 [Values(100)] int times,
+                                                 [Values(1.0, 20)] double scaleFactor)
         {
             var sw = new Stopwatch();
-            Bitmap imageA = Images.Resize(Images.MonaLisa_EvoLisa200x200, 2.0);
-            Bitmap imageB = Images.Resize(Images.MonaLisa_EvoLisa200x200_TestApproximation, 2.0);
+            Bitmap imageA = Images.Resize(Images.MonaLisa_EvoLisa200x200, scaleFactor);
+            Bitmap imageB = Images.Resize(Images.MonaLisa_EvoLisa200x200_TestApproximation, scaleFactor);
             using (var fitnessEvaluator = new FitnessEvaluatorBitmap(imageA, fitnessEquation))
             {
                 // warmup
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     double fitness = fitnessEvaluator.EvaluateFitness(imageB);
                 }
@@ -57,15 +59,15 @@ namespace ImageEvolver.UnitTests.Fitness
                 sw.Stop();
             }
             TimeSpan time = TimeSpan.FromTicks(sw.Elapsed.Ticks/times);
-            Console.WriteLine("{0:0.000}ms / fitness test", time.TotalMilliseconds);
+            Console.WriteLine("{0}x{1} {2:0.000}ms / fitness test", imageA.Width, imageA.Width, time.TotalMilliseconds);
         }
 
         [Test]
-        public static void TestPerformanceOpenCL([Values(1000)] int times)
+        public static void TestPerformanceOpenCL([Values(100)] int times, [Values(1.0, 20)] double scaleFactor)
         {
             var sw = new Stopwatch();
-            Bitmap imageA = Images.Resize(Images.MonaLisa_EvoLisa200x200, 2.0);
-            Bitmap imageB = Images.Resize(Images.MonaLisa_EvoLisa200x200_TestApproximation, 2.0);
+            Bitmap imageA = Images.Resize(Images.MonaLisa_EvoLisa200x200, scaleFactor);
+            Bitmap imageB = Images.Resize(Images.MonaLisa_EvoLisa200x200_TestApproximation, scaleFactor);
 
             using (var openGlContext = new RenderingContextBase())
             {
@@ -77,9 +79,9 @@ namespace ImageEvolver.UnitTests.Fitness
                 })
                              .Wait();
                 using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(openGlContext.GLTaskFactory, imageA, openGlContext.GraphicsContext))
-                {                
+                {
                     // warmup
-                    for (int i = 0; i < 100; i++)
+                    for (int i = 0; i < 5; i++)
                     {
                         double fitness = fitnessEvaluator.EvaluateFitness(imageBFrameBuffer);
                     }
@@ -92,8 +94,8 @@ namespace ImageEvolver.UnitTests.Fitness
                     sw.Stop();
                 }
             }
-            TimeSpan time = TimeSpan.FromTicks(sw.Elapsed.Ticks / times);
-            Console.WriteLine("{0:0.000}ms / fitness test", time.TotalMilliseconds);
+            TimeSpan time = TimeSpan.FromTicks(sw.Elapsed.Ticks/times);
+            Console.WriteLine("{0}x{1} {2:0.000}ms / fitness test", imageA.Width, imageA.Width, time.TotalMilliseconds);
         }
     }
 }
