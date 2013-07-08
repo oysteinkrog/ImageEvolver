@@ -97,18 +97,20 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                     //                }
                 case 100:
                 {
-                    renderer.Render(evolutionEngine.CurrentBestCandidate)
-                            .Save(string.Format("select_{0}_{1}.bmp",
-                                                evolutionEngine.Selected,
-                                                renderer.GetType()
-                                                        .Name));
+                    Bitmap bitmap;
+                    renderer.Render(evolutionEngine.CurrentBestCandidate, out bitmap);
+                    bitmap.Save(string.Format("select_{0}_{1}.bmp",
+                                              evolutionEngine.Selected,
+                                              renderer.GetType()
+                                                      .Name));
                     Assert.AreEqual(1224598761, evolutionEngine.CurrentBestFitness);
                     break;
                 }
                 case 800:
                 {
-                    renderer.Render(evolutionEngine.CurrentBestCandidate)
-                            .Save(string.Format("select_{0}_{1}.bmp",
+                    Bitmap bitmap;
+                    renderer.Render(evolutionEngine.CurrentBestCandidate, out bitmap);
+                    bitmap.Save(string.Format("select_{0}_{1}.bmp",
                                                 evolutionEngine.Selected,
                                                 renderer.GetType()
                                                         .Name));
@@ -117,8 +119,9 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                 }
                 case 1150:
                 {
-                    renderer.Render(evolutionEngine.CurrentBestCandidate)
-                            .Save(string.Format("select_{0}_{1}.bmp",
+                    Bitmap bitmap;
+                    renderer.Render(evolutionEngine.CurrentBestCandidate, out bitmap);
+                    bitmap.Save(string.Format("select_{0}_{1}.bmp",
                                                 evolutionEngine.Selected,
                                                 renderer.GetType()
                                                         .Name));
@@ -127,11 +130,12 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                 }
                 case 1432:
                 {
-                    renderer.Render(evolutionEngine.CurrentBestCandidate)
-                            .Save(string.Format("select_{0}_{1}.bmp",
-                                                evolutionEngine.Selected,
-                                                renderer.GetType()
-                                                        .Name));
+                    Bitmap bitmap;
+                    renderer.Render(evolutionEngine.CurrentBestCandidate, out bitmap);
+                    bitmap.Save(string.Format("select_{0}_{1}.bmp",
+                                              evolutionEngine.Selected,
+                                              renderer.GetType()
+                                                      .Name));
                     Assert.AreEqual(191361415, evolutionEngine.CurrentBestFitness);
                     return true;
                 }

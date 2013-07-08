@@ -69,7 +69,7 @@ namespace ImageEvolver.Rendering.Bitmap
             // free native resources if there are any.
         }
 
-        public System.Drawing.Bitmap Render(IImageCandidate candidate)
+        public void Render(IImageCandidate candidate, out System.Drawing.Bitmap bitmap)
         {
             _g.Clear(candidate.BackgroundColor);
 
@@ -77,7 +77,7 @@ namespace ImageEvolver.Rendering.Bitmap
             {
                 Render(feature, _g);
             }
-            return _bitmap;
+            bitmap = _bitmap;
         }
 
         private static Brush GetGDIBrush(ColorFeature b)

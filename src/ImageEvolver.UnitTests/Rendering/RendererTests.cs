@@ -39,8 +39,9 @@ namespace ImageEvolver.UnitTests.Rendering
             var candidate = new TestCandidate(size);
             using (var renderer = new GenericFeaturesRendererBitmap(size))
             {
-                renderer.Render(candidate)
-                        .Save(@"SinglePolygonTest_Bitmap.bmp");
+                Bitmap bitmap;
+                renderer.Render(candidate, out bitmap);
+                bitmap.Save(@"SinglePolygonTest_Bitmap.bmp");
             }
         }
 
@@ -51,8 +52,9 @@ namespace ImageEvolver.UnitTests.Rendering
             var candidate = new TestCandidate(size);
             using (var renderer = new GenericFeaturesRendererOpenGL(size))
             {
-                renderer.Render(candidate)
-                        .Save(@"SinglePolygonTest_OpenGL.bmp");
+                Bitmap bitmap;
+                renderer.Render(candidate, out bitmap);
+                bitmap.Save(@"SinglePolygonTest_OpenGL.bmp");
             }
         }
     }

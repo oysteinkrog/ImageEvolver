@@ -16,7 +16,8 @@ namespace ImageEvolver.Fitness.Bitmap
 
         public double EvaluateFitness(IImageCandidate candidate)
         {
-            var bitmap = _renderer.Render(candidate);
+            System.Drawing.Bitmap bitmap;
+            _renderer.Render(candidate, out bitmap);
             return _bitmapFitnessEvalutor.EvaluateFitness(bitmap);
         }
     }

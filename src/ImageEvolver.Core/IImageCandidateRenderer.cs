@@ -22,8 +22,8 @@ using System;
 
 namespace ImageEvolver.Core
 {
-    public interface IImageCandidateRenderer<in TCandidate, out TValue> : IDisposable where TCandidate : IImageCandidate
+    public interface IImageCandidateRenderer<in TCandidate, TValue> : IDisposable where TCandidate : IImageCandidate
     {
-        TValue Render(TCandidate candidate);
+        void Render(TCandidate candidate, out TValue result);
     }
 }

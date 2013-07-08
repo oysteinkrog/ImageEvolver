@@ -71,10 +71,10 @@ namespace ImageEvolver.Rendering.OpenGL
             });
         }
         
-        public Bitmap Render(IImageCandidate candidate)
+        public void Render(IImageCandidate candidate, out Bitmap bitmap)
         {
             var renderTask = RenderCandidateAsync(candidate);
-            return renderTask.Result;
+            bitmap = renderTask.Result;
         }
 
         public Task<Bitmap> RenderCandidateAsync(IImageCandidate candidate)
