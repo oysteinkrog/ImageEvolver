@@ -1,0 +1,11 @@
+#version 140
+in vec2 out_TexCoord;
+in vec3 out_Normal;
+                          
+uniform mat4x4 view;
+uniform sampler2D texture;
+
+void main()
+{
+	gl_FragColor = texture2D(texture, out_TexCoord);
+}
