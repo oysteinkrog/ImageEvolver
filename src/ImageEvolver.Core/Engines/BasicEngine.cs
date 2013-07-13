@@ -71,6 +71,9 @@ namespace ImageEvolver.Core.Engines
         public long Selected { get; set; }
 
         [PublicAPI]
+        public TimeSpan TotalSimulationTime { get; private set; }
+
+        [PublicAPI]
         public PerformanceDetails GetPerformanceDetails()
         {
             var total = (double) _totalStopwatch.ElapsedMilliseconds;
@@ -121,6 +124,7 @@ namespace ImageEvolver.Core.Engines
                 finally
                 {
                     _totalStopwatch.Stop();
+                    TotalSimulationTime += _totalStopwatch.Elapsed;
                 }
             }
         }
