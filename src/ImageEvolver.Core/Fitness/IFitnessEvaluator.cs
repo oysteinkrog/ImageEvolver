@@ -20,8 +20,8 @@
 
 namespace ImageEvolver.Core.Fitness
 {
-    public interface IFitnessEvaluator<in T>
+    public interface IFitnessEvaluator<in TCandidate>
     {
-        double EvaluateFitness(T candidate);
+        double EvaluateFitness(TCandidate candidate);
     }
 }
