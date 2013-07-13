@@ -71,16 +71,18 @@ namespace ImageEvolver.Apps.ConsoleTestApp
             get { return _evolutionEngine; }
         }
 
-        public Bitmap RenderToBitmap(EvoLisaImageCandidate currentBestCandidate)
+        public void RenderToBitmap(EvoLisaImageCandidate currentBestCandidate, Bitmap outputBuffer)
         {
-            _renderer.Render(currentBestCandidate, _renderBuffer);
-            return _renderBuffer;
+            _renderer.Render(currentBestCandidate, outputBuffer);
         }
 
         public void SaveBitmap(EvoLisaImageCandidate candidate, string filePath)
         {
-            RenderToBitmap(candidate)
-                .Save(filePath);
+            using (var output = new Bitmap(_renderBuffer.Size.Width, _renderBuffer.Size.Height))
+            {
+                RenderToBitmap(candidate, output);
+                output.Save(filePath);
+            }
         }
     }
 }
