@@ -46,7 +46,8 @@ namespace ImageEvolver.Rendering.OpenGL
                 GraphicsContext = new GraphicsContext(GraphicsMode, Window.WindowInfo);
                 GraphicsContext.MakeCurrent(Window.WindowInfo);
                 GraphicsContext.LoadAll();
-            });
+            })
+                         .Wait();
         }
 
         ~RenderingContextBase()

@@ -33,7 +33,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
             _renderer.GLTaskFactory.StartNew(() =>
             {
                 _renderBuffer = new FrameBuffer(sourceImage.Width, sourceImage.Height, 1, false);
-            });
+            }).Wait(); ;
 
             _fitnessEvalutor = new FitnessEvaluatorOpenCL(genericFeaturesRendererOpenGL.GLTaskFactory,
                                                           sourceImage,
