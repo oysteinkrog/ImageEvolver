@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Clpp.Core.Utilities;
@@ -49,6 +50,7 @@ namespace ImageEvolver.Apps.OpenGLTestApp
             _bestCandidateBitmap = new Bitmap(_sourceImage.Width, _sourceImage.Height);
 
             _simpleEvolutionSystem = new SimpleEvolutionSystemBitmap(_sourceImage);
+            _bestCandidate = _simpleEvolutionSystem.Engine.BestCandidate;
 
             _runEvoluationTask = Task.Factory.StartNew(() =>
             {
@@ -164,7 +166,9 @@ namespace ImageEvolver.Apps.OpenGLTestApp
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             // Set the title to show the fps
-            base.Title = ((int) base.RenderFrequency).ToString();
+            base.Title = string.Format("Candidates/s: {0:0.00000} Generations/s: {1:0.00000}",
+                                       _simpleEvolutionSystem.Engine.Candidates/_simpleEvolutionSystem.Engine.TotalSimulationTime.TotalSeconds,
+                                       _bestCandidate.Generation/_simpleEvolutionSystem.Engine.TotalSimulationTime.TotalSeconds);
 
             base.OnUpdateFrame(e);
         }
