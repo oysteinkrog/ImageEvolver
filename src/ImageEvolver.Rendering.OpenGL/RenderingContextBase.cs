@@ -20,6 +20,7 @@
 
 using System;
 using System.Threading.Tasks;
+using ImageEvolver.Core.Utilities;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -28,10 +29,10 @@ namespace ImageEvolver.Rendering.OpenGL
     public class RenderingContextBase : IDisposable
     {
         public readonly TaskFactory GLTaskFactory;
-        public GraphicsContext GraphicsContext;
-        protected GraphicsMode GraphicsMode;
-        protected NativeWindow Window;
         private bool _disposed;
+        private GraphicsContext _graphicsContext;
+        private GraphicsMode _graphicsMode;
+        private NativeWindow _window;
 
         public RenderingContextBase()
         {
@@ -40,12 +41,12 @@ namespace ImageEvolver.Rendering.OpenGL
             // intialize the context, important that this is run on the correct thread
             GLTaskFactory.StartNew(() =>
             {
-                Window = new NativeWindow();
+                _window = new NativeWindow();
 
-                GraphicsMode = new GraphicsMode(32, 24, 0, 4);
-                GraphicsContext = new GraphicsContext(GraphicsMode, Window.WindowInfo);
-                GraphicsContext.MakeCurrent(Window.WindowInfo);
-                GraphicsContext.LoadAll();
+                _graphicsMode = new GraphicsMode(32, 24, 0, 4);
+                _graphicsContext = new GraphicsContext(_graphicsMode, _window.WindowInfo);
+                _graphicsContext.MakeCurrent(_window.WindowInfo);
+                _graphicsContext.LoadAll();
             })
                          .Wait();
         }
@@ -73,17 +74,8 @@ namespace ImageEvolver.Rendering.OpenGL
                 if (disposing)
                 {
                     // dispose managed resources
-                    if (GraphicsContext != null)
-                    {
-                        GraphicsContext.Dispose();
-                        GraphicsContext = null;
-                    }
-
-                    if (Window != null)
-                    {
-                        Window.Dispose();
-                        Window = null;
-                    }
+                    DisposeHelper.Dispose(ref _graphicsContext);
+                    DisposeHelper.Dispose(ref _window);
                 }
                 // free native resources if there are any
             }
@@ -91,6 +83,21 @@ namespace ImageEvolver.Rendering.OpenGL
             {
                 _disposed = true;
             }
+        }
+
+        public GraphicsContext GraphicsContext
+        {
+            get { return _graphicsContext; }
+        }
+
+        public GraphicsMode GraphicsMode
+        {
+            get { return _graphicsMode; }
+        }
+
+        public NativeWindow Window
+        {
+            get { return _window; }
         }
     }
 }
