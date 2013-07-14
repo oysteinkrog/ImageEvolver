@@ -21,37 +21,38 @@
 using System;
 using System.Threading.Tasks;
 using ImageEvolver.Core.Utilities;
+using JetBrains.Annotations;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace ImageEvolver.Rendering.OpenGL
 {
-    public class RenderingContextBase : IDisposable
+    public class OpenGlContext : IOpenGLContext
     {
-        public readonly TaskFactory GLTaskFactory;
+        private readonly TaskFactory _taskFactory;
         private bool _disposed;
-        private GraphicsContext _graphicsContext;
+        private IGraphicsContext _graphicsContext;
         private GraphicsMode _graphicsMode;
-        private NativeWindow _window;
+        private INativeWindow _window;
 
-        public RenderingContextBase()
+        public OpenGlContext()
         {
-            GLTaskFactory = new TaskFactory(new SingleThreadTaskScheduler());
+            _taskFactory = new TaskFactory(new SingleThreadTaskScheduler());
 
             // intialize the context, important that this is run on the correct thread
-            GLTaskFactory.StartNew(() =>
+            TaskFactory.StartNew(() =>
             {
                 _window = new NativeWindow();
 
                 _graphicsMode = new GraphicsMode(32, 24, 0, 4);
-                _graphicsContext = new GraphicsContext(_graphicsMode, _window.WindowInfo);
-                _graphicsContext.MakeCurrent(_window.WindowInfo);
+                _graphicsContext = new GraphicsContext(GraphicsMode, Window.WindowInfo);
+                _graphicsContext.MakeCurrent(Window.WindowInfo);
                 _graphicsContext.LoadAll();
             })
-                         .Wait();
+                       .Wait();
         }
 
-        ~RenderingContextBase()
+        ~OpenGlContext()
         {
             Dispose(false);
         }
@@ -85,19 +86,28 @@ namespace ImageEvolver.Rendering.OpenGL
             }
         }
 
-        public GraphicsContext GraphicsContext
-        {
-            get { return _graphicsContext; }
-        }
-
+        [PublicAPI]
         public GraphicsMode GraphicsMode
         {
             get { return _graphicsMode; }
         }
 
-        public NativeWindow Window
+        [PublicAPI]
+        public TaskFactory TaskFactory
+        {
+            get { return _taskFactory; }
+        }
+
+        [PublicAPI]
+        public INativeWindow Window
         {
             get { return _window; }
+        }
+
+        [PublicAPI]
+        public IGraphicsContext GraphicsContext
+        {
+            get { return _graphicsContext; }
         }
     }
 }

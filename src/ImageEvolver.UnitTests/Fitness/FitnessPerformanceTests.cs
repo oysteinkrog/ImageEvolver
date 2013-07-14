@@ -69,16 +69,16 @@ namespace ImageEvolver.UnitTests.Fitness
             Bitmap imageA = Images.Resize(Images.MonaLisa_EvoLisa200x200, scaleFactor);
             Bitmap imageB = Images.Resize(Images.MonaLisa_EvoLisa200x200_TestApproximation, scaleFactor);
 
-            using (var openGlContext = new RenderingContextBase())
+            using (var openGlContext = new OpenGlContext())
             {
                 FrameBuffer imageBFrameBuffer = null;
-                openGlContext.GLTaskFactory.StartNew(() =>
+                openGlContext.TaskFactory.StartNew(() =>
                 {
                     var imageBTexture = new Texture2D(imageB, false);
                     imageBFrameBuffer = new FrameBuffer(imageBTexture.Width, imageBTexture.Width, new Texture[] {imageBTexture}, null);
                 })
                              .Wait();
-                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(openGlContext.GLTaskFactory, imageA, openGlContext.GraphicsContext))
+                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(imageA, openGlContext))
                 {
                     // warmup
                     for (int i = 0; i < 5; i++)

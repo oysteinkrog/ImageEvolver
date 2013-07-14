@@ -38,6 +38,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=6.1.0.0, Culture=neutral, PublicKeyToken=3f033448d4bb5376, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\JetBrains.Annotations.7.0\lib\net45\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\OpenTK.1.1.1160.61462\lib\NET40\OpenTK.dll</HintPath>
@@ -52,8 +56,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IOpenGLContext.cs" />
     <Compile Include="RenderingTechnique.cs" />
-    <Compile Include="RenderingContextBase.cs" />
+    <Compile Include="OpenGlContext.cs" />
     <Compile Include="SingleThreadTaskScheduler.cs" />
     <Compile Include="GenericFeaturesRendererOpenGL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

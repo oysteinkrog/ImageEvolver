@@ -64,6 +64,10 @@
       <Project>{6B38160E-58D5-4EDF-9C68-BE35C36FA315}</Project>
       <Name>ImageEvolver.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ImageEvolver.Rendering.OpenGL\ImageEvolver.Rendering.OpenGL.csproj">
+      <Project>{E08E04FF-F740-446D-9AE3-FD2153A7719A}</Project>
+      <Name>ImageEvolver.Rendering.OpenGL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\lib\clpp.net\src\Clpp.Core\Clpp.Core.csproj">
       <Project>{E5DF4771-30A4-4246-9FBC-5D650D4F899D}</Project>
       <Name>Clpp.Core</Name>

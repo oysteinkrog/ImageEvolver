@@ -26,9 +26,10 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading.Tasks;
 using ImageEvolver.Core;
+using ImageEvolver.Core.Mutation;
+using ImageEvolver.Core.Utilities;
 using Koeky3D;
 using Koeky3D.BufferHandling;
-using Koeky3D.Textures;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -36,21 +37,24 @@ using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace ImageEvolver.Rendering.OpenGL
 {
-    public sealed class GenericFeaturesRendererOpenGL : RenderingContextBase, IDisposable, IImageCandidateRenderer<IImageCandidate, Bitmap>, IImageCandidateRenderer<IImageCandidate, FrameBuffer>
+    public sealed class GenericFeaturesRendererOpenGL : IImageCandidateRenderer<IImageCandidate, Bitmap>, IImageCandidateRenderer<IImageCandidate, FrameBuffer>
     {
         private readonly Size _size;
         private GLManager _glManager;
+        private FrameBuffer _internalFrameBuffer;
+        private OwnedObject<IOpenGLContext> _openGlContext;
         private RenderOptions _renderOptions;
         private RenderingTechnique _technique;
-        private FrameBuffer _internalFrameBuffer;
 
-        public GenericFeaturesRendererOpenGL(Size size)
+        public GenericFeaturesRendererOpenGL(Size size, IOpenGLContext openGLContext = null)
         {
             _size = size;
+            _openGlContext = new OwnedObject<IOpenGLContext>(openGLContext ?? new OpenGlContext(), openGLContext == null);
+
             // init, run on the gl thread
-            GLTaskFactory.StartNew(() =>
+            _openGlContext.Value.TaskFactory.StartNew(() =>
             {
-                _renderOptions = new RenderOptions(_size.Width, _size.Height, Window.WindowState, VSyncMode.Off);
+                _renderOptions = new RenderOptions(_size.Width, _size.Height, _openGlContext.Value.Window.WindowState, VSyncMode.Off);
                 _glManager = new GLManager(_renderOptions);
                 _technique = new RenderingTechnique();
                 _internalFrameBuffer = new FrameBuffer(size.Width, size.Height, 1, false);
@@ -67,28 +71,53 @@ namespace ImageEvolver.Rendering.OpenGL
                 _glManager.BlendingEnabled = true;
                 _glManager.BlendingSource = BlendingFactorSrc.SrcAlpha;
                 _glManager.BlendingDestination = BlendingFactorDest.OneMinusSrcAlpha;
-            }).Wait();
+            })
+                        .Wait();
         }
 
-        public void Render(IImageCandidate candidate, FrameBuffer outputBuffer)
+        public void Dispose()
         {
-            RenderCandidateToTextureAsync(candidate, outputBuffer).Wait();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // get rid of managed resources
+                _openGlContext.Value.TaskFactory.StartNew(() =>
+                {
+                    _internalFrameBuffer.DestroyFramebuffer(false);
+                })
+                            .Wait();
+
+                DisposeHelper.Dispose(ref _openGlContext);
+            }
+            // get rid of unmanaged resources
         }
 
         public void Render(IImageCandidate candidate, Bitmap outputBuffer)
         {
-            RenderCandidateToBitmapAsync(candidate, outputBuffer).Wait();
+            RenderCandidateToBitmapAsync(candidate, outputBuffer)
+                .Wait();
+        }
+
+        public void Render(IImageCandidate candidate, FrameBuffer outputBuffer)
+        {
+            RenderCandidateToTextureAsync(candidate, outputBuffer)
+                .Wait();
         }
 
         public Task RenderCandidateToBitmapAsync(IImageCandidate candidate, Bitmap outputBuffer)
         {
-            return GLTaskFactory.StartNew(() =>
+            return _openGlContext.Value.TaskFactory.StartNew(() =>
             {
                 _glManager.PushFrameBuffer(_internalFrameBuffer);
 
                 RenderCandidateInternal(candidate);
 
-                var data = outputBuffer.LockBits(new Rectangle(0, 0, _size.Width, _size.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+                BitmapData data = outputBuffer.LockBits(new Rectangle(0, 0, _size.Width, _size.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
                 try
                 {
                     GL.ReadPixels(0, 0, _size.Width, _size.Height, OpenTK.Graphics.OpenGL.PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
@@ -98,7 +127,7 @@ namespace ImageEvolver.Rendering.OpenGL
                     outputBuffer.UnlockBits(data);
                 }
 
-//                outputBuffer.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                //                outputBuffer.RotateFlip(RotateFlipType.RotateNoneFlipY);
 
                 _glManager.PopFrameBuffer();
             });
@@ -106,7 +135,7 @@ namespace ImageEvolver.Rendering.OpenGL
 
         public Task RenderCandidateToTextureAsync(IImageCandidate candidate, FrameBuffer outputBuffer)
         {
-            return GLTaskFactory.StartNew(() =>
+            return _openGlContext.Value.TaskFactory.StartNew(() =>
             {
                 _glManager.PushFrameBuffer(outputBuffer);
 
@@ -119,13 +148,13 @@ namespace ImageEvolver.Rendering.OpenGL
         private void RenderCandidateInternal(IImageCandidate candidate)
         {
             // all the features are given their own "layer", startin with negative z-index and building up to our znear (0)
-            var numLayers = candidate.Features.Count();
+            int numLayers = candidate.Features.Count();
 
-            var zLayerDelta = 1f;
+            float zLayerDelta = 1f;
 
             // Use a orthographic projection
-            var zNear = 0f;
-            var zFar = -(numLayers*zLayerDelta);
+            float zNear = 0f;
+            float zFar = -(numLayers*zLayerDelta);
 
             // use pixel offset of 0.5f, due to how the opengl rasterization rules specify that a pixel position is in it's center (0.5f)
             // we want gdi/direct3d behaviour, where the pixel position is in the top left corner
@@ -150,10 +179,10 @@ namespace ImageEvolver.Rendering.OpenGL
             var indices = new List<ushort>();
             var colors = new List<Color4>();
 
-            var zIndex = zFar;
-            foreach (var feature in candidate.Features)
+            float zIndex = zFar;
+            foreach (IFeature feature in candidate.Features)
             {
-                var result = TriangleGeometryGenerator.GenerateGeometry(feature);
+                TriangleGeometryGenerator.TriangleGeometry result = TriangleGeometryGenerator.GenerateGeometry(feature);
 
                 indices.AddRange(result.IndexList.Select(a => (ushort) (a + vertexes.Count)));
                 vertexes.AddRange(result.VertexList.Select(a => new Vector3(a.X, a.Y, zIndex)));
@@ -177,6 +206,5 @@ namespace ImageEvolver.Rendering.OpenGL
 
             vertexArray.ClearResources(true);
         }
-
     }
 }

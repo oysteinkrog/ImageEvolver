@@ -28,16 +28,19 @@ using Clpp.Core;
 using Clpp.Core.Scan;
 using Clpp.Core.Utilities;
 using ImageEvolver.Core.Fitness;
+using ImageEvolver.Core.Utilities;
+using ImageEvolver.Rendering.OpenGL;
 using Koeky3D.BufferHandling;
 using Koeky3D.Textures;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using DisposeHelper = ImageEvolver.Core.Utilities.DisposeHelper;
 
 namespace ImageEvolver.Fitness.OpenCL
 {
     public sealed class FitnessEvaluatorOpenCL : IFitnessEvaluator<FrameBuffer>, IDisposable
     {
-        private readonly TaskFactory _taskFactory;
+        private readonly OwnedObject<IOpenGLContext> _openGlContext;
         private ClppContext _clppContext;
 
         private ClppScanGPU<ulong> _clppScanSum;
@@ -52,11 +55,11 @@ namespace ImageEvolver.Fitness.OpenCL
         private Texture2D _sourceBitmapTexture;
 
 
-        public FitnessEvaluatorOpenCL(TaskFactory taskFactory, Bitmap sourceBitmap, GraphicsContext graphicsContext)
+        public FitnessEvaluatorOpenCL(Bitmap sourceBitmap, OpenGlContext openGlContext = null)
         {
-            _taskFactory = taskFactory;
+            _openGlContext = new OwnedObject<IOpenGLContext>(openGlContext ?? new OpenGlContext(), openGlContext == null);
 
-            _taskFactory.StartNew(() =>
+            _openGlContext.Value.TaskFactory.StartNew(() =>
             {
                 _sourceBitmap = sourceBitmap;
                 _size = _sourceBitmap.Size;
@@ -77,7 +80,7 @@ namespace ImageEvolver.Fitness.OpenCL
                                                      {
                                                          device
                                                      },
-                                                     OpenGLInterop.GetInteropProperties(graphicsContext, computePlatform),
+                                                     OpenGLInterop.GetInteropProperties(_openGlContext.Value.GraphicsContext, computePlatform),
                                                      null,
                                                      IntPtr.Zero);
 
@@ -126,7 +129,7 @@ namespace ImageEvolver.Fitness.OpenCL
 
         public double EvaluateFitness(FrameBuffer candidate)
         {
-            return _taskFactory.StartNew(() => EvaluateFitnessInternal(candidate))
+            return _openGlContext.Value.TaskFactory.StartNew(() => EvaluateFitnessInternal(candidate))
                                .Result;
         }
 

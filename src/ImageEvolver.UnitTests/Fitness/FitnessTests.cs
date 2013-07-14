@@ -69,10 +69,10 @@ namespace ImageEvolver.UnitTests.Fitness
         {
             Bitmap imageA = Images.MonaLisa_EvoLisa200x200;
             Bitmap imageB = Images.MonaLisa_EvoLisa200x200_TestApproximation;
-            using (var openGlContext = new RenderingContextBase())
+            using (var openGlContext = new OpenGlContext())
             {
                 FrameBuffer imageBFrameBuffer = null;
-                openGlContext.GLTaskFactory.StartNew(() =>
+                openGlContext.TaskFactory.StartNew(() =>
                 {
                     var imageBTexture = new Texture2D(imageB, false);
                     imageBFrameBuffer = new FrameBuffer(imageBTexture.Width,
@@ -81,7 +81,7 @@ namespace ImageEvolver.UnitTests.Fitness
                                                         null);
                 })
                              .Wait();
-                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(openGlContext.GLTaskFactory, imageA, openGlContext.GraphicsContext))
+                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(imageA, openGlContext))
                 {
                     double fitness = fitnessEvaluator.EvaluateFitness(imageBFrameBuffer);
                     Assert.AreEqual(46865993.0, fitness);

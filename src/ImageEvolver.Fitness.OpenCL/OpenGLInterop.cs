@@ -28,7 +28,7 @@ namespace ImageEvolver.Fitness.OpenCL
 {
     public static class OpenGLInterop
     {
-        public static ComputeContextPropertyList GetInteropProperties(GraphicsContext graphicsContext, ComputePlatform computePlatform)
+        public static ComputeContextPropertyList GetInteropProperties(IGraphicsContext graphicsContext, ComputePlatform computePlatform)
         {
             // TODO: add support for other types of gl/cl interop (linux, os x etc)
             IntPtr curDC = wglGetCurrentDC();

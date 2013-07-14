@@ -28,16 +28,16 @@ namespace ImageEvolver.Apps.ConsoleTestApp
         public SimpleEvolutionSystemOpenCL(Bitmap sourceImage)
         {
             //_renderer = new GenericFeaturesRendererBitmap(sourceImage.Size);
-            var genericFeaturesRendererOpenGL = new GenericFeaturesRendererOpenGL(sourceImage.Size);
+            var openGlContext = new OpenGlContext();
+            var genericFeaturesRendererOpenGL = new GenericFeaturesRendererOpenGL(sourceImage.Size, openGlContext);
             _renderer = genericFeaturesRendererOpenGL;
-            _renderer.GLTaskFactory.StartNew(() =>
+            openGlContext.TaskFactory.StartNew(() =>
             {
                 _renderBuffer = new FrameBuffer(sourceImage.Width, sourceImage.Height, 1, false);
             }).Wait(); ;
 
-            _fitnessEvalutor = new FitnessEvaluatorOpenCL(genericFeaturesRendererOpenGL.GLTaskFactory,
-                                                          sourceImage,
-                                                          genericFeaturesRendererOpenGL.GraphicsContext);
+            _fitnessEvalutor = new FitnessEvaluatorOpenCL(sourceImage,
+                                                          openGlContext);
 
             _evoLisaAlgorithmSettings = new EvoLisaAlgorithmSettings();
             _basicPseudoRandomProvider = new BasicPseudoRandomProvider(0);
