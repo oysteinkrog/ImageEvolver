@@ -78,6 +78,7 @@
     <Compile Include="Utilities\DisposeHelper.cs" />
     <Compile Include="Utilities\IRange.cs" />
     <Compile Include="Utilities\MathUtils.cs" />
+    <Compile Include="Utilities\OwnedObject.cs" />
     <Compile Include="Utilities\Range.cs" />
   </ItemGroup>
   <ItemGroup>
