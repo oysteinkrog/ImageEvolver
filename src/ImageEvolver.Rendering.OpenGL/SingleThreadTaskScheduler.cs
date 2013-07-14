@@ -23,6 +23,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ImageEvolver.Core.Utilities;
 
 namespace ImageEvolver.Rendering.OpenGL
 {
@@ -77,8 +78,7 @@ namespace ImageEvolver.Rendering.OpenGL
                 _thread.Join();
 
                 // Cleanup
-                _tasks.Dispose();
-                _tasks = null;
+                DisposeHelper.Dispose(ref _tasks);
             }
 
 
