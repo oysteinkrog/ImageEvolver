@@ -30,8 +30,8 @@ namespace ImageEvolver.Algorithms.EvoLisa
 {
     internal sealed class EvoLisaCandidateGenerator : ICandidateGenerator<EvoLisaImageCandidate>
     {
-        private readonly ColorFeatureMutation _colorFeatureMutation;
         private readonly IImageCandidateMutation<EvoLisaImageCandidate>[] _imageCandidateMutations;
+        private readonly IFeatureMutation<ColorFeature, EvoLisaImageCandidate>[] _colorFeatureMutations;
         private readonly PointFeatureMutation _pointFeatureMutation;
         private readonly PolygonFeatureMutation _polygonFeatureMutation;
         private readonly IRandomProvider _randomProvider;
@@ -53,7 +53,12 @@ namespace ImageEvolver.Algorithms.EvoLisa
 
             _polygonFeatureMutation = new PolygonFeatureMutation(_settings, _randomProvider);
             _pointFeatureMutation = new PointFeatureMutation(_settings, _randomProvider);
-            _colorFeatureMutation = new ColorFeatureMutation(_settings, _randomProvider);
+
+            _colorFeatureMutations = new IFeatureMutation<ColorFeature, EvoLisaImageCandidate>[]
+                                     {
+                                         new RedColorFeatureMutation(_settings, _randomProvider), new GreenColorFeatureMutation(_settings, _randomProvider),
+                                         new BlueColorFeatureMutation(_settings, _randomProvider), new AlphaColorFeatureMutation(_settings, _randomProvider)
+                                     };
         }
 
         ~EvoLisaCandidateGenerator()
@@ -118,7 +123,10 @@ namespace ImageEvolver.Algorithms.EvoLisa
             {
                 mutated |= _polygonFeatureMutation.MutateFeature(polygonFeature, newCandidate);
 
-                mutated |= _colorFeatureMutation.MutateFeature(polygonFeature.Color, newCandidate);
+                foreach (var colorFeatureMutation in _colorFeatureMutations)
+                {
+                    mutated |= colorFeatureMutation.MutateFeature(polygonFeature.Color, newCandidate);
+                }
 
                 foreach (PointFeature pointFeature in polygonFeature.Points)
                 {
