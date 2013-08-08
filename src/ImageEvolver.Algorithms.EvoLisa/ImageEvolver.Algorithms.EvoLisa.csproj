@@ -48,7 +48,9 @@
     <Compile Include="Mutation\AlphaColorFeatureMutation.cs" />
     <Compile Include="Mutation\BlueColorFeatureMutation.cs" />
     <Compile Include="Mutation\GreenColorFeatureMutation.cs" />
-    <Compile Include="Mutation\PointFeatureMutation.cs" />
+    <Compile Include="Mutation\MovePointMaxPointFeatureMutation.cs" />
+    <Compile Include="Mutation\MovePointMidPointFeatureMutation.cs" />
+    <Compile Include="Mutation\MovePointMinPointFeatureMutation.cs" />
     <Compile Include="Mutation\RedColorFeatureMutation.cs" />
     <Compile Include="Mutation\RemovePointPolygonFeatureMutation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

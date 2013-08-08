@@ -32,7 +32,7 @@ namespace ImageEvolver.Algorithms.EvoLisa
     {
         private readonly IImageCandidateMutation<EvoLisaImageCandidate>[] _imageCandidateMutations;
         private readonly IFeatureMutation<ColorFeature, EvoLisaImageCandidate>[] _colorFeatureMutations;
-        private readonly PointFeatureMutation _pointFeatureMutation;
+        private readonly IFeatureMutation<PointFeature, EvoLisaImageCandidate>[] _pointFeatureMutations;
         private readonly IFeatureMutation<PolygonFeature, EvoLisaImageCandidate>[] _polygonFeatureMutations;
         private readonly IRandomProvider _randomProvider;
         private readonly EvoLisaAlgorithmSettings _settings;
@@ -57,7 +57,12 @@ namespace ImageEvolver.Algorithms.EvoLisa
                                            new RemovePointPolygonFeatureMutation(_settings, _randomProvider)
                                        };
 
-            _pointFeatureMutation = new PointFeatureMutation(_settings, _randomProvider);
+            _pointFeatureMutations = new IFeatureMutation<PointFeature, EvoLisaImageCandidate>[]
+                                     {
+                                         new MovePointMaxPointFeatureMutation(_settings, _randomProvider),
+                                         new MovePointMidPointFeatureMutation(_settings, _randomProvider),
+                                         new MovePointMinPointFeatureMutation(_settings, _randomProvider)
+                                     };
 
             _colorFeatureMutations = new IFeatureMutation<ColorFeature, EvoLisaImageCandidate>[]
                                      {
@@ -138,7 +143,10 @@ namespace ImageEvolver.Algorithms.EvoLisa
 
                 foreach (PointFeature pointFeature in polygonFeature.Points)
                 {
-                    mutated |= _pointFeatureMutation.MutateFeature(pointFeature, newCandidate);
+                    foreach (var pointFeatureMutation in _pointFeatureMutations)
+                    {
+                        mutated |= pointFeatureMutation.MutateFeature(pointFeature, newCandidate);
+                    }
                 }
             }
             return mutated;
