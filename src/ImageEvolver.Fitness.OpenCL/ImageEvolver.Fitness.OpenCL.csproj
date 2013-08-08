@@ -52,7 +52,7 @@
   <ItemGroup>
     <Compile Include="CalculateImageDifferenceError.cs" />
     <Compile Include="FitnessEvaluatorOpenCL.cs" />
-    <Compile Include="OpenGLInterop.cs" />
+    <Compile Include="OpenGLPlatformInterop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

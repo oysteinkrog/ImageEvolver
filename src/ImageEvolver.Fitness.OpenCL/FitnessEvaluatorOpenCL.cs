@@ -80,7 +80,7 @@ namespace ImageEvolver.Fitness.OpenCL
                                                      {
                                                          device
                                                      },
-                                                     OpenGLInterop.GetInteropProperties(_openGlContext.Value.GraphicsContext, computePlatform),
+                                                     OpenGLPlatformInterop.GetInteropProperties(_openGlContext.Value.GraphicsContext, computePlatform),
                                                      null,
                                                      IntPtr.Zero);
 
