@@ -77,7 +77,7 @@ namespace ImageEvolver.Algorithms.EvoLisa
             var candidate = new EvoLisaImageCandidate(size);
             for (int i = 0; i < settings.PolygonsRange.Min; i++)
             {
-                EvoLisaImageCandidateMutation.AddPolygon(candidate, settings, randomProvider);
+                AddPolygonMutation.AddPolygon(candidate, settings, randomProvider);
             }
             return candidate;
         }

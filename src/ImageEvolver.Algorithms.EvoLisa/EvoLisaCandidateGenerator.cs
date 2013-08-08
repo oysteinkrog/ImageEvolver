@@ -23,13 +23,15 @@ using System.Drawing;
 using ImageEvolver.Algorithms.EvoLisa.Mutation;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;
+using ImageEvolver.Core.Mutation;
+using ImageEvolver.Features;
 
 namespace ImageEvolver.Algorithms.EvoLisa
 {
     internal sealed class EvoLisaCandidateGenerator : ICandidateGenerator<EvoLisaImageCandidate>
     {
         private readonly ColorFeatureMutation _colorFeatureMutation;
-        private readonly EvoLisaImageCandidateMutation _imageCandidateMutation;
+        private readonly IImageCandidateMutation<EvoLisaImageCandidate>[] _imageCandidateMutations;
         private readonly PointFeatureMutation _pointFeatureMutation;
         private readonly PolygonFeatureMutation _polygonFeatureMutation;
         private readonly IRandomProvider _randomProvider;
@@ -43,7 +45,12 @@ namespace ImageEvolver.Algorithms.EvoLisa
             _randomProvider = randomProvider;
             _settings = settings;
 
-            _imageCandidateMutation = new EvoLisaImageCandidateMutation(_settings, _randomProvider);
+            _imageCandidateMutations = new IImageCandidateMutation<EvoLisaImageCandidate>[]
+                                       {
+                                           new AddPolygonMutation(_settings, _randomProvider), new RemovePolygonMutation(_settings, _randomProvider),
+                                           new MovePolygonMutation(_settings, _randomProvider)
+                                       };
+
             _polygonFeatureMutation = new PolygonFeatureMutation(_settings, _randomProvider);
             _pointFeatureMutation = new PointFeatureMutation(_settings, _randomProvider);
             _colorFeatureMutation = new ColorFeatureMutation(_settings, _randomProvider);
@@ -102,15 +109,18 @@ namespace ImageEvolver.Algorithms.EvoLisa
         {
             bool mutated = false;
 
-            mutated |= _imageCandidateMutation.MutateCandidate(newCandidate);
+            foreach (var evoLisaImageCandidateMutation in _imageCandidateMutations)
+            {
+                mutated |= evoLisaImageCandidateMutation.MutateCandidate(newCandidate);
+            }
 
-            foreach (var polygonFeature in newCandidate.Polygons)
+            foreach (PolygonFeature polygonFeature in newCandidate.Polygons)
             {
                 mutated |= _polygonFeatureMutation.MutateFeature(polygonFeature, newCandidate);
 
                 mutated |= _colorFeatureMutation.MutateFeature(polygonFeature.Color, newCandidate);
 
-                foreach (var pointFeature in polygonFeature.Points)
+                foreach (PointFeature pointFeature in polygonFeature.Points)
                 {
                     mutated |= _pointFeatureMutation.MutateFeature(pointFeature, newCandidate);
                 }

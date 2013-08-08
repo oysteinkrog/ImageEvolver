@@ -1,7 +1,7 @@
-﻿#region Copyright
+#region Copyright
 
 //     ImageEvolver
-//     Copyright (C) 2013-2013 Øystein Krog
+//     Copyright (C) 2013-2013 �ystein Krog
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU Affero General Public License as
@@ -20,6 +20,7 @@
 
 using System.Collections.Generic;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
+using ImageEvolver.Algorithms.EvoLisa.Utilities;
 using ImageEvolver.Core;
 using ImageEvolver.Core.Mutation;
 using ImageEvolver.Core.Utilities;
@@ -27,19 +28,45 @@ using ImageEvolver.Features;
 
 namespace ImageEvolver.Algorithms.EvoLisa.Mutation
 {
-    internal abstract class EvoLisaImageCandidateMutation : IImageCandidateMutation<EvoLisaImageCandidate>
+    internal class AddPolygonMutation : IImageCandidateMutation<EvoLisaImageCandidate>
     {
         private readonly IRandomProvider _randomProvider;
         private readonly EvoLisaAlgorithmSettings _settings;
 
-        public EvoLisaImageCandidateMutation(EvoLisaAlgorithmSettings settings, IRandomProvider randomProvider)
+        public AddPolygonMutation(EvoLisaAlgorithmSettings settings, IRandomProvider randomProvider)
         {
             _settings = settings;
             _randomProvider = randomProvider;
         }
 
-        public abstract bool MutateCandidate(EvoLisaImageCandidate candidate);
-	
+        public bool MutateCandidate(EvoLisaImageCandidate candidate)
+        {
+            bool mutated = false;
+
+            if (_randomProvider.WillMutate(_settings.AddPolygonMutationRate.Value))
+            {
+                mutated |= AddPolygon(candidate, _settings, _randomProvider);
+            }
+            return mutated;
+        }
+
+        internal static bool AddPolygon(EvoLisaImageCandidate evoLisaImageCandidate, EvoLisaAlgorithmSettings settings, IRandomProvider randomProvider)
+        {
+            if (evoLisaImageCandidate.Polygons.Count < settings.PolygonsRange.Max)
+            {
+                PolygonFeature newPolygonFeature = GetRandomPolygonFeature(randomProvider,
+                                                                           settings.PointsPerPolygonRange.Min,
+                                                                           evoLisaImageCandidate.Size.Width,
+                                                                           evoLisaImageCandidate.Size.Height);
+                int index = randomProvider.NextInt(0, evoLisaImageCandidate.Polygons.Count);
+
+                evoLisaImageCandidate.Polygons.Insert(index, newPolygonFeature);
+                return true;
+            }
+            return false;
+        }
+
+
         private static ColorFeature GetRandomColorFeature(IRandomProvider randomProvider)
         {
             return new ColorFeature(randomProvider.NextInt(0, 255),
@@ -53,7 +80,7 @@ namespace ImageEvolver.Algorithms.EvoLisa.Mutation
             return new PointFeature(randomProvider.NextInt(0, maxX), randomProvider.NextInt(0, maxY));
         }
 
-        protected static PolygonFeature GetRandomPolygonFeature(IRandomProvider randomProvider, int numPoints, int maxX, int maxY)
+        private static PolygonFeature GetRandomPolygonFeature(IRandomProvider randomProvider, int numPoints, int maxX, int maxY)
         {
             var points = new List<PointFeature>();
 

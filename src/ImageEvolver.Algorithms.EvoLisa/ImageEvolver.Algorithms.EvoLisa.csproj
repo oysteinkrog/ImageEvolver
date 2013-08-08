@@ -42,7 +42,10 @@
     <Compile Include="EvoLisaCandidateGenerator.cs" />
     <Compile Include="EvoLisaImageCandidate.cs" />
     <Compile Include="Mutation\ColorFeatureMutation.cs" />
+    <Compile Include="Mutation\AddPolygonMutation.cs" />
     <Compile Include="Mutation\EvoLisaImageCandidateMutation.cs" />
+    <Compile Include="Mutation\MovePolygonMutation.cs" />
+    <Compile Include="Mutation\RemovePolygonMutation.cs" />
     <Compile Include="Mutation\PointFeatureMutation.cs" />
     <Compile Include="Mutation\PolygonFeatureMutation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
