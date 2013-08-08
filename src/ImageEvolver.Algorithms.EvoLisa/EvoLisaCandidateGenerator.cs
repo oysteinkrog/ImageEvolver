@@ -33,7 +33,7 @@ namespace ImageEvolver.Algorithms.EvoLisa
         private readonly IImageCandidateMutation<EvoLisaImageCandidate>[] _imageCandidateMutations;
         private readonly IFeatureMutation<ColorFeature, EvoLisaImageCandidate>[] _colorFeatureMutations;
         private readonly PointFeatureMutation _pointFeatureMutation;
-        private readonly PolygonFeatureMutation _polygonFeatureMutation;
+        private readonly IFeatureMutation<PolygonFeature, EvoLisaImageCandidate>[] _polygonFeatureMutations;
         private readonly IRandomProvider _randomProvider;
         private readonly EvoLisaAlgorithmSettings _settings;
         private readonly Bitmap _sourceImage;
@@ -51,7 +51,12 @@ namespace ImageEvolver.Algorithms.EvoLisa
                                            new MovePolygonMutation(_settings, _randomProvider)
                                        };
 
-            _polygonFeatureMutation = new PolygonFeatureMutation(_settings, _randomProvider);
+            _polygonFeatureMutations = new IFeatureMutation<PolygonFeature, EvoLisaImageCandidate>[]
+                                       {
+                                           new AddPointPolygonFeatureMutation(_settings, _randomProvider),
+                                           new RemovePointPolygonFeatureMutation(_settings, _randomProvider)
+                                       };
+
             _pointFeatureMutation = new PointFeatureMutation(_settings, _randomProvider);
 
             _colorFeatureMutations = new IFeatureMutation<ColorFeature, EvoLisaImageCandidate>[]
@@ -121,7 +126,10 @@ namespace ImageEvolver.Algorithms.EvoLisa
 
             foreach (PolygonFeature polygonFeature in newCandidate.Polygons)
             {
-                mutated |= _polygonFeatureMutation.MutateFeature(polygonFeature, newCandidate);
+                foreach (var polygonFeatureMutation in _polygonFeatureMutations)
+                {
+                    mutated |= polygonFeatureMutation.MutateFeature(polygonFeature, newCandidate);
+                }
 
                 foreach (var colorFeatureMutation in _colorFeatureMutations)
                 {

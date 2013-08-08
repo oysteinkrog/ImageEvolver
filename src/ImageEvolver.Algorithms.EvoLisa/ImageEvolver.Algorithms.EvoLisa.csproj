@@ -41,6 +41,7 @@
     <Compile Include="EvoLisaAlgorithmDetails.cs" />
     <Compile Include="EvoLisaCandidateGenerator.cs" />
     <Compile Include="EvoLisaImageCandidate.cs" />
+    <Compile Include="Mutation\AddPointPolygonFeatureMutation.cs" />
     <Compile Include="Mutation\AddPolygonMutation.cs" />
     <Compile Include="Mutation\MovePolygonMutation.cs" />
     <Compile Include="Mutation\RemovePolygonMutation.cs" />
@@ -48,8 +49,8 @@
     <Compile Include="Mutation\BlueColorFeatureMutation.cs" />
     <Compile Include="Mutation\GreenColorFeatureMutation.cs" />
     <Compile Include="Mutation\PointFeatureMutation.cs" />
-    <Compile Include="Mutation\PolygonFeatureMutation.cs" />
     <Compile Include="Mutation\RedColorFeatureMutation.cs" />
+    <Compile Include="Mutation\RemovePointPolygonFeatureMutation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\EvoLisaAlgorithmSettings.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
