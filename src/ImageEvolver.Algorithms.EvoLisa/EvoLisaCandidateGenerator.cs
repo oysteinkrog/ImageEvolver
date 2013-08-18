@@ -104,7 +104,7 @@ namespace ImageEvolver.Algorithms.EvoLisa
 
                 if (parentCandidate == null)
                 {
-                    return GenerateCandidate();
+                    return GenerateStartCandidate();
                 }
 
                 EvoLisaImageCandidate newCandidate = parentCandidate.Clone();
@@ -115,9 +115,14 @@ namespace ImageEvolver.Algorithms.EvoLisa
             }
         }
 
-        public EvoLisaImageCandidate GenerateCandidate()
+        public EvoLisaImageCandidate GenerateStartCandidate()
         {
-            return EvoLisaImageCandidate.GetRandom(_randomProvider, _settings, _sourceImage.Size);
+            var candidate = new EvoLisaImageCandidate(_sourceImage.Size);
+            for (int i = 0; i < _settings.PolygonsRange.Min; i++)
+            {
+                AddPolygonMutation.AddPolygon(candidate, _settings, _randomProvider);
+            }
+            return candidate;
         }
 
         private bool Mutate(EvoLisaImageCandidate newCandidate)

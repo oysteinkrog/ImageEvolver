@@ -24,7 +24,7 @@ namespace ImageEvolver.Core
 {
     public interface ICandidateGenerator<T> : IDisposable where T : IImageCandidate
     {
-        T GenerateCandidate();
+        T GenerateStartCandidate();
         T GenerateCandidate(T T, out bool mutated);
     }
 }

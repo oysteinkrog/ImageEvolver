@@ -49,7 +49,7 @@ namespace ImageEvolver.Core.Engines
             _fitnessEvaluator = fitnessEvaluator;
 
             // initial candidate
-            TCandidate startCandidate = _candidateGenerator.GenerateCandidate();
+            TCandidate startCandidate = _candidateGenerator.GenerateStartCandidate();
 
             BestCandidate = new CandidateDetails
                             {

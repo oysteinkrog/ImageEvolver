@@ -31,13 +31,13 @@ namespace ImageEvolver.Algorithms.EvoLisa
 {
     public sealed class EvoLisaImageCandidate : IImageCandidate
     {
-        private EvoLisaImageCandidate(Size size)
+        internal EvoLisaImageCandidate(Size size)
         {
             Size = size;
             Polygons = new List<PolygonFeature>();
         }
 
-        private EvoLisaImageCandidate(Size size, IEnumerable<PolygonFeature> polygons)
+        internal EvoLisaImageCandidate(Size size, IEnumerable<PolygonFeature> polygons)
         {
             Size = size;
             Polygons = polygons.ToList();
@@ -70,16 +70,6 @@ namespace ImageEvolver.Algorithms.EvoLisa
             IEnumerable<PolygonFeature> clonedPolygons = Polygons.Select(polygon => polygon.Clone())
                                                                  .Cast<PolygonFeature>();
             return new EvoLisaImageCandidate(Size, clonedPolygons);
-        }
-
-        public static EvoLisaImageCandidate GetRandom(IRandomProvider randomProvider, EvoLisaAlgorithmSettings settings, Size size)
-        {
-            var candidate = new EvoLisaImageCandidate(size);
-            for (int i = 0; i < settings.PolygonsRange.Min; i++)
-            {
-                AddPolygonMutation.AddPolygon(candidate, settings, randomProvider);
-            }
-            return candidate;
         }
     }
 }
