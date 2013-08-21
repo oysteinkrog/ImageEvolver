@@ -18,12 +18,13 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using ImageEvolver.Core.Mutation;
 
 namespace ImageEvolver.Features
 {
-    public sealed class CircleFeature : IFeatureWithSubFeatures
+    public sealed class CircleFeature : IFeatureWithSubFeatures, IEquatable<CircleFeature>
     {
         public CircleFeature(PointFeature point, ColorFeature color)
         {
@@ -34,10 +35,15 @@ namespace ImageEvolver.Features
         public ColorFeature Color { get; private set; }
         public PointFeature Point { get; private set; }
 
+        public bool Equals(CircleFeature other)
+        {
+            return Equals(Color, other.Color) && Equals(Point, other.Point);
+        }
+
         public IFeature Clone()
         {
-            var clonedPoint = Point.Clone();
-            var clonedColor = Color.Clone();
+            IFeature clonedPoint = Point.Clone();
+            IFeature clonedColor = Color.Clone();
             return new CircleFeature((PointFeature) clonedPoint, (ColorFeature) clonedColor);
         }
 
@@ -47,6 +53,27 @@ namespace ImageEvolver.Features
             {
                 yield return Color;
                 yield return Point;
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            return obj is CircleFeature && Equals((CircleFeature) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((Color != null ? Color.GetHashCode() : 0)*397) ^ (Point != null ? Point.GetHashCode() : 0);
             }
         }
     }

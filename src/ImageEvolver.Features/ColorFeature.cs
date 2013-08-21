@@ -18,11 +18,12 @@
 
 #endregion
 
+using System;
 using ImageEvolver.Core.Mutation;
 
 namespace ImageEvolver.Features
 {
-    public sealed class ColorFeature : IFeature
+    public sealed class ColorFeature : IFeature, IEquatable<ColorFeature>
     {
         public ColorFeature(int red, int green, int blue, int alpha)
         {
@@ -40,6 +41,36 @@ namespace ImageEvolver.Features
         public IFeature Clone()
         {
             return new ColorFeature(Red, Green, Blue, Alpha);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            return obj is ColorFeature && Equals((ColorFeature) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = Alpha;
+                hashCode = (hashCode*397) ^ Blue;
+                hashCode = (hashCode*397) ^ Green;
+                hashCode = (hashCode*397) ^ Red;
+                return hashCode;
+            }
+        }
+
+        public bool Equals(ColorFeature other)
+        {
+            return Alpha == other.Alpha && Blue == other.Blue && Green == other.Green && Red == other.Red;
         }
     }
 }

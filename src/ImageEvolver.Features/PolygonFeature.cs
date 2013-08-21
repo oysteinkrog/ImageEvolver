@@ -18,13 +18,14 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ImageEvolver.Core.Mutation;
 
 namespace ImageEvolver.Features
 {
-    public sealed class PolygonFeature : IFeatureWithSubFeatures
+    public sealed class PolygonFeature : IFeatureWithSubFeatures, IEquatable<PolygonFeature>
     {
         private readonly List<PointFeature> _points;
 
@@ -39,6 +40,11 @@ namespace ImageEvolver.Features
         public IReadOnlyList<PointFeature> Points
         {
             get { return _points; }
+        }
+
+        public bool Equals(PolygonFeature other)
+        {
+            return Equals(Color, other.Color) && Points.SequenceEqual(other.Points);
         }
 
         public IFeature Clone()
@@ -61,6 +67,27 @@ namespace ImageEvolver.Features
             }
         }
 
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            return obj is PolygonFeature && Equals((PolygonFeature) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((Color != null ? Color.GetHashCode() : 0)*397) ^ (Points != null ? CalculatePointsListHashCode() : 0);
+            }
+        }
+
         public void InsertPoint(int index, PointFeature newPoint)
         {
             _points.Insert(index, newPoint);
@@ -69,6 +96,16 @@ namespace ImageEvolver.Features
         public void RemovePointAt(int index)
         {
             _points.RemoveAt(index);
+        }
+
+        private int CalculatePointsListHashCode()
+        {
+            int hash = 19;
+            foreach (PointFeature point in _points)
+            {
+                hash = hash*31 + point.GetHashCode();
+            }
+            return hash;
         }
     }
 }

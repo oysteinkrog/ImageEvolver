@@ -18,11 +18,12 @@
 
 #endregion
 
+using System;
 using ImageEvolver.Core.Mutation;
 
 namespace ImageEvolver.Features
 {
-    public class PointFeature : IFeature
+    public class PointFeature : IFeature, IEquatable<PointFeature>
     {
         public PointFeature(int x, int y)
         {
@@ -36,6 +37,36 @@ namespace ImageEvolver.Features
         public IFeature Clone()
         {
             return new PointFeature(X, Y);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+            return Equals((PointFeature) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (X*397) ^ Y;
+            }
+        }
+
+        public bool Equals(PointFeature other)
+        {
+            return X == other.X && Y == other.Y;
         }
     }
 }
