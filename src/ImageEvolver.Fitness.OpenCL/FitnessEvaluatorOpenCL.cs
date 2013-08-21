@@ -40,6 +40,7 @@ namespace ImageEvolver.Fitness.OpenCL
 {
     public sealed class FitnessEvaluatorOpenCL : IFitnessEvaluator<FrameBuffer>, IDisposable
     {
+        private readonly FrameBuffer _frameBuffer;
         private readonly OwnedObject<IOpenGLContext> _openGlContext;
         private ClppContext _clppContext;
 
@@ -53,10 +54,12 @@ namespace ImageEvolver.Fitness.OpenCL
         private Bitmap _sourceBitmap;
         private ComputeImage2D _sourceBitmapComputeImage;
         private Texture2D _sourceBitmapTexture;
+        private ComputeImage2D _frameBufferComputeImage;
 
 
-        public FitnessEvaluatorOpenCL(Bitmap sourceBitmap, OpenGlContext openGlContext = null)
+        public FitnessEvaluatorOpenCL(Bitmap sourceBitmap, FrameBuffer frameBuffer, OpenGlContext openGlContext = null)
         {
+            _frameBuffer = frameBuffer;
             _openGlContext = new OwnedObject<IOpenGLContext>(openGlContext ?? new OpenGlContext(), openGlContext == null);
 
             _openGlContext.Value.TaskFactory.StartNew(() =>
@@ -97,6 +100,12 @@ namespace ImageEvolver.Fitness.OpenCL
                                                                                  0,
                                                                                  _sourceBitmapTexture.TextureId);
 
+                _frameBufferComputeImage = ComputeImage2D.CreateFromGLTexture2D(_computeContext,
+                                                                                ComputeMemoryFlags.ReadOnly,
+                                                                                (int) _frameBuffer.PrimaryTexture.TextureTarget,
+                                                                                0,
+                                                                                _frameBuffer.PrimaryTexture.TextureId);
+
                 _errorCalc = new CalculateImageDifferenceError(_computeContext, device, _computeCommandQueue, _sourceBitmapComputeImage);
             })
                         .Wait();
@@ -135,28 +144,25 @@ namespace ImageEvolver.Fitness.OpenCL
 
         private double EvaluateFitnessInternal(FrameBuffer inputFrameBuffer)
         {
+            if (_frameBuffer != inputFrameBuffer)
+                throw new ArgumentException();
+
             // flush opengl operations
             GL.Flush();
             GL.Finish();
 
             ulong fitnessErrorSum = 0;
 
-            using (
-                ComputeImage2D computeImage = ComputeImage2D.CreateFromGLTexture2D(_computeContext,
-                                                                                   ComputeMemoryFlags.ReadOnly,
-                                                                                   (int) inputFrameBuffer.PrimaryTexture.TextureTarget,
-                                                                                   0,
-                                                                                   inputFrameBuffer.PrimaryTexture.TextureId))
             {
                 var computeMemories = new Collection<ComputeMemory>(new List<ComputeMemory>
                                                                     {
                                                                         _sourceBitmapComputeImage,
-                                                                        computeImage
+                                                                        _frameBufferComputeImage
                                                                     });
 
                 _computeCommandQueue.AcquireGLObjects(computeMemories, null);
 
-                _errorCalc.ComputeDifference(computeImage);
+                _errorCalc.ComputeDifference(_frameBufferComputeImage);
 
                 var val = new ulong[_size.Width * _size.Height];
                 _computeCommandQueue.ReadFromBuffer(_errorCalc.ErrorSquaredOutputBuffer, ref val, true, null);

@@ -78,7 +78,7 @@ namespace ImageEvolver.UnitTests.Fitness
                     imageBFrameBuffer = new FrameBuffer(imageBTexture.Width, imageBTexture.Width, new Texture[] {imageBTexture}, null);
                 })
                              .Wait();
-                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(imageA, openGlContext))
+                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(imageA, imageBFrameBuffer, openGlContext))
                 {
                     // warmup
                     for (int i = 0; i < 5; i++)

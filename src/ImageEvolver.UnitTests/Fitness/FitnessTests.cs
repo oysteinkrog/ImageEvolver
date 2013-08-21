@@ -81,7 +81,7 @@ namespace ImageEvolver.UnitTests.Fitness
                                                         null);
                 })
                              .Wait();
-                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(imageA, openGlContext))
+                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(imageA, imageBFrameBuffer, openGlContext))
                 {
                     double fitness = fitnessEvaluator.EvaluateFitness(imageBFrameBuffer);
                     Assert.AreEqual(46865993.0, fitness);
