@@ -68,7 +68,7 @@ namespace ImageEvolver.Algorithms.EvoLisa.Mutation
 
                     var newPoint = new PointFeature(newPointX, newPointY);
 
-                    polygonFeature.Points.Insert(index, newPoint);
+                    polygonFeature.InsertPoint(index, newPoint);
 
                     return true;
                 }

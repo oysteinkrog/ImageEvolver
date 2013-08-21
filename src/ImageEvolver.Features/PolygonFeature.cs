@@ -26,20 +26,26 @@ namespace ImageEvolver.Features
 {
     public sealed class PolygonFeature : IFeatureWithSubFeatures
     {
+        private readonly List<PointFeature> _points;
+
         public PolygonFeature(IEnumerable<PointFeature> points, ColorFeature color)
         {
-            Points = points.ToList();
+            _points = points.ToList();
             Color = color;
         }
 
         public ColorFeature Color { get; private set; }
-        public List<PointFeature> Points { get; private set; }
+
+        public IReadOnlyList<PointFeature> Points
+        {
+            get { return _points; }
+        }
 
         public IFeature Clone()
         {
-            var clonedPoints = Points.Select(point => point.Clone())
-                                     .Cast<PointFeature>();
-            var clonedColor = Color.Clone();
+            IEnumerable<PointFeature> clonedPoints = Points.Select(point => point.Clone())
+                                                           .Cast<PointFeature>();
+            IFeature clonedColor = Color.Clone();
             return new PolygonFeature(clonedPoints, (ColorFeature) clonedColor);
         }
 
@@ -48,13 +54,21 @@ namespace ImageEvolver.Features
             get
             {
                 yield return Color;
-                foreach (var pointFeature in Points)
+                foreach (PointFeature pointFeature in Points)
                 {
                     yield return pointFeature;
                 }
             }
         }
+
+        public void InsertPoint(int index, PointFeature newPoint)
+        {
+            _points.Insert(index, newPoint);
+        }
+
+        public void RemovePointAt(int index)
+        {
+            _points.RemoveAt(index);
+        }
     }
-    
-    
 }

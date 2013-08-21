@@ -76,7 +76,7 @@ namespace ImageEvolver.Rendering.Bitmap
             return new SolidBrush(Color.FromArgb(b.Alpha, b.Red, b.Green, b.Blue));
         }
 
-        private static Point[] GetGDIPoints(IList<PointFeature> points)
+        private static Point[] GetGDIPoints(IReadOnlyCollection<PointFeature> points)
         {
             var gdiPoints = new Point[points.Count];
             int i = 0;

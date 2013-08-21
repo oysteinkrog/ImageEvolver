@@ -59,7 +59,7 @@ namespace ImageEvolver.Algorithms.EvoLisa.Mutation
                 if (evoLisaImageCandidate.PointCount > settings.PointsRange.Min)
                 {
                     int index = randomProvider.NextInt(0, polygonFeature.Points.Count);
-                    polygonFeature.Points.RemoveAt(index);
+                    polygonFeature.RemovePointAt(index);
                     return true;
                 }
             }
