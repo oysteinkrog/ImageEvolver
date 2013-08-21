@@ -38,15 +38,16 @@ namespace ImageEvolver.Apps.ConsoleTestApp
                 {
                     if (simpleEvolutionSystem.Engine.Step())
                     {
-                        var bestCandidate = simpleEvolutionSystem.Engine.BestCandidate;
+                        BasicEngine<EvoLisaImageCandidate>.CandidateDetails bestCandidate = simpleEvolutionSystem.Engine.BestCandidate;
                         BasicEngine<EvoLisaImageCandidate>.PerformanceDetails perfDetails = simpleEvolutionSystem.Engine.GetPerformanceDetails();
 
-                        Console.WriteLine("Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Fitness {4:0.000}",
+                        Console.WriteLine("Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Rendering  {4:0.000}, Fitness {5:0.000}",
                                           simpleEvolutionSystem.Engine.Selected,
                                           bestCandidate.Generation,
                                           bestCandidate.Fitness,
                                           perfDetails.RelativeMutationTime,
-                                          perfDetails.RelativeFitnessEvaluationTime);
+                                          perfDetails.RelativeFitnessEvaluationTime*perfDetails.FitnessEvaluationDetails.RelativeRenderingTime,
+                                          perfDetails.RelativeFitnessEvaluationTime*perfDetails.FitnessEvaluationDetails.RelativeFitnessEvaluationTime);
 
                         // print every 100 better-fitness selection
                         if (simpleEvolutionSystem.Engine.Selected%100 == 0)

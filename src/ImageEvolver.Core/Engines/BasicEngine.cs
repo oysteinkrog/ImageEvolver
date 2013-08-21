@@ -33,12 +33,13 @@ namespace ImageEvolver.Core.Engines
     {
         private readonly ICandidateGenerator<TCandidate> _candidateGenerator;
         private readonly Stopwatch _candidateStopwatch = new Stopwatch();
-        private readonly IFitnessEvaluator<TCandidate> _fitnessEvaluator;
+        private readonly IProfilingFitnessEvaluator<TCandidate> _fitnessEvaluator;
         private readonly Stopwatch _fitnessStopwatch = new Stopwatch();
         private readonly object _syncRoot = new object();
         private readonly Stopwatch _totalStopwatch = new Stopwatch();
+        private IRenderingFitnessEvalutionProfilingDetails _fitnessEvaluatorProfilingDetails;
 
-        public BasicEngine(ICandidateGenerator<TCandidate> candidateGenerator, IFitnessEvaluator<TCandidate> fitnessEvaluator)
+        public BasicEngine(ICandidateGenerator<TCandidate> candidateGenerator, IProfilingFitnessEvaluator<TCandidate> fitnessEvaluator)
         {
             if (candidateGenerator == null)
             {
@@ -81,7 +82,8 @@ namespace ImageEvolver.Core.Engines
             return new PerformanceDetails
                    {
                        RelativeMutationTime = _candidateStopwatch.ElapsedMilliseconds/total,
-                       RelativeFitnessEvaluationTime = _fitnessStopwatch.ElapsedMilliseconds/total
+                       RelativeFitnessEvaluationTime = _fitnessStopwatch.ElapsedMilliseconds/total,
+                       FitnessEvaluationDetails = _fitnessEvaluatorProfilingDetails
                    };
         }
 
@@ -109,7 +111,9 @@ namespace ImageEvolver.Core.Engines
                     {
                         newCandidateInfo.Generation = parentCandidateInfo.Generation + 1;
 
-                        newCandidateInfo.Fitness = EvaluateCandidateFitness(newCandidateInfo.Candidate);
+                        IProfilingFitnessEvaluationResult profilingFitnessEvaluationResult = EvaluateCandidateFitness(newCandidateInfo.Candidate);
+                        _fitnessEvaluatorProfilingDetails = profilingFitnessEvaluationResult.ProfilingDetails;
+                        newCandidateInfo.Fitness = profilingFitnessEvaluationResult.Fitness;
 
                         if (newCandidateInfo.Fitness <= BestCandidate.Fitness)
                         {
@@ -129,7 +133,7 @@ namespace ImageEvolver.Core.Engines
             }
         }
 
-        private double EvaluateCandidateFitness(TCandidate candidate)
+        private IProfilingFitnessEvaluationResult EvaluateCandidateFitness(TCandidate candidate)
         {
             _fitnessStopwatch.Start();
             try
@@ -170,6 +174,7 @@ namespace ImageEvolver.Core.Engines
         {
             public double RelativeFitnessEvaluationTime;
             public double RelativeMutationTime;
+            public IRenderingFitnessEvalutionProfilingDetails FitnessEvaluationDetails { get; set; }
         }
     }
 }

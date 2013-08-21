@@ -45,6 +45,8 @@
     <Compile Include="CandidateFitnessEvaluator.cs" />
     <Compile Include="Extensions\RandomProviderExtensions.cs" />
     <Compile Include="Fitness\FitnessEquation.cs" />
+    <Compile Include="Fitness\IProfilingFitnessEvaluationResult.cs" />
+    <Compile Include="Fitness\IProfilingFitnessEvaluator.cs" />
     <Compile Include="ICandidateGenerator.cs" />
     <Compile Include="Fitness\IFitnessEvaluator.cs" />
     <Compile Include="IImageCandidateRenderer.cs" />

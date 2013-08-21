@@ -34,10 +34,9 @@ namespace ImageEvolver.Apps.ConsoleTestApp
             openGlContext.TaskFactory.StartNew(() =>
             {
                 _renderBuffer = new FrameBuffer(sourceImage.Width, sourceImage.Height, 1, false);
-            }).Wait(); ;
-
-            _fitnessEvalutor = new FitnessEvaluatorOpenCL(sourceImage,
-                                                          openGlContext);
+                _fitnessEvalutor = new FitnessEvaluatorOpenCL(sourceImage, _renderBuffer, openGlContext);
+            })
+                         .Wait();
 
             _evoLisaAlgorithmSettings = new EvoLisaAlgorithmSettings();
             _basicPseudoRandomProvider = new BasicPseudoRandomProvider(0);
