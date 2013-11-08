@@ -96,15 +96,6 @@ namespace ImageEvolver.Apps.OpenGLTestApp
         {
             if (_updateRender)
             {
-                Console.WriteLine("Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Rendering  {4:0.000}, Fitness {5:0.000}",
-                                  _simpleEvolutionSystem.Engine.Selected,
-                                  _bestCandidate.Generation,
-                                  _bestCandidate.Fitness,
-                                  _perfDetails.RelativeMutationTime,
-                                  _perfDetails.RelativeFitnessEvaluationTime*_perfDetails.FitnessEvaluationDetails.RelativeRenderingTime,
-                                  _perfDetails.RelativeFitnessEvaluationTime*_perfDetails.FitnessEvaluationDetails.RelativeFitnessEvaluationTime);
-
-
                 // By calling PushRenderState we save the OpenGL settings exposed by the GLManager class
                 _glManager.PushRenderState();
 
@@ -119,6 +110,14 @@ namespace ImageEvolver.Apps.OpenGLTestApp
                 _perfDetails = _simpleEvolutionSystem.Engine.GetPerformanceDetails();
                 _bestCandidate = _simpleEvolutionSystem.Engine.BestCandidate;
                 _simpleEvolutionSystem.RenderToBitmap(_bestCandidate.Candidate, _bestCandidateBitmap);
+
+                Console.WriteLine("Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Rendering  {4:0.000}, Fitness {5:0.000}",
+                             _simpleEvolutionSystem.Engine.Selected,
+                             _bestCandidate.Generation,
+                             _bestCandidate.Fitness,
+                             _perfDetails.RelativeMutationTime,
+                             _perfDetails.RelativeFitnessEvaluationTime * _perfDetails.FitnessEvaluationDetails.RelativeRenderingTime,
+                             _perfDetails.RelativeFitnessEvaluationTime * _perfDetails.FitnessEvaluationDetails.RelativeFitnessEvaluationTime);
 
                 if (_candidateTexture != null)
                 {
