@@ -19,12 +19,19 @@
 #endregion
 
 using System;
+using System.Drawing;
 using ImageEvolver.Core.Mutation;
 
 namespace ImageEvolver.Features
 {
     public class PointFeature : IFeature, IEquatable<PointFeature>
     {
+        public PointFeature(Point point)
+        {
+            X = point.X;
+            Y = point.Y;
+        }
+
         public PointFeature(int x, int y)
         {
             X = x;
