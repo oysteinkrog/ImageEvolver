@@ -6,3 +6,4 @@
 	path = src/lib/clpp.net
 	url = git@github.com:oysteinkrog/clpp.net.git	
 	ignore = untracked
+	branch = master
