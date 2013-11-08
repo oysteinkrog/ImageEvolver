@@ -11,11 +11,11 @@ namespace ImageEvolver.Rendering.OpenGL
 {
     internal static class TriangleGeometryGenerator
     {
-        internal struct TriangleGeometry
+        internal class TriangleGeometry
         {
-            public List<Color4> ColorList { get; set; }
-            public List<ushort> IndexList { get; set; }
-            public List<Vector2> VertexList { get; set; }
+            public IEnumerable<Color4> ColorList { get; set; }
+            public IEnumerable<ushort> IndexList { get; set; }
+            public IEnumerable<Vector2> VertexList { get; set; }
         }
 
         public static TriangleGeometry GenerateGeometry(IFeature feature)

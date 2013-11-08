@@ -26,8 +26,8 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading.Tasks;
 using ImageEvolver.Core;
-using ImageEvolver.Core.Mutation;
 using ImageEvolver.Core.Utilities;
+using ImageEvolver.Features;
 using Koeky3D;
 using Koeky3D.BufferHandling;
 using OpenTK;
@@ -40,15 +40,20 @@ namespace ImageEvolver.Rendering.OpenGL
     public sealed class GenericFeaturesRendererOpenGL : IImageCandidateRenderer<IImageCandidate, Bitmap>, IImageCandidateRenderer<IImageCandidate, FrameBuffer>
     {
         private readonly Size _size;
+        private readonly bool _useGeometryCache;
         private GLManager _glManager;
         private FrameBuffer _internalFrameBuffer;
         private OwnedObject<IOpenGLContext> _openGlContext;
         private RenderOptions _renderOptions;
         private RenderingTechnique _technique;
 
-        public GenericFeaturesRendererOpenGL(Size size, IOpenGLContext openGLContext = null)
+        private readonly Dictionary<PolygonFeature, TriangleGeometryGenerator.TriangleGeometry> _geometryCache =
+            new Dictionary<PolygonFeature, TriangleGeometryGenerator.TriangleGeometry>(new PolygonFeatureEqualityComparator());
+
+        public GenericFeaturesRendererOpenGL(Size size, IOpenGLContext openGLContext = null, bool useGeometryCache = false)
         {
             _size = size;
+            _useGeometryCache = useGeometryCache;
             _openGlContext = new OwnedObject<IOpenGLContext>(openGLContext ?? new OpenGlContext(), openGLContext == null);
 
             // init, run on the gl thread
@@ -180,13 +185,26 @@ namespace ImageEvolver.Rendering.OpenGL
             var colors = new List<Color4>();
 
             float zIndex = zFar;
-            foreach (IFeature feature in candidate.Features)
+            // ATM we only know how to render PolygonFeature
+            // TODO: extend this to other features
+            foreach (var feature in candidate.Features.OfType<PolygonFeature>())
             {
-                TriangleGeometryGenerator.TriangleGeometry result = TriangleGeometryGenerator.GenerateGeometry(feature);
+                TriangleGeometryGenerator.TriangleGeometry geometry;
+                if (_useGeometryCache)
+                {
+                    if (!_geometryCache.TryGetValue(feature, out geometry))
+                    {
+                        _geometryCache[feature] = geometry = TriangleGeometryGenerator.GenerateGeometry(feature);
+                    }
+                }
+                else
+                {
+                    geometry = TriangleGeometryGenerator.GenerateGeometry(feature);
+                }
 
-                indices.AddRange(result.IndexList.Select(a => (ushort) (a + vertexes.Count)));
-                vertexes.AddRange(result.VertexList.Select(a => new Vector3(a.X, a.Y, zIndex)));
-                colors.AddRange(result.ColorList);
+                indices.AddRange(geometry.IndexList.Select(a => (ushort) (a + vertexes.Count)));
+                vertexes.AddRange(geometry.VertexList.Select(a => new Vector3(a.X, a.Y, zIndex)));
+                colors.AddRange(geometry.ColorList);
 
                 zIndex += zLayerDelta;
                 Debug.Assert(zIndex <= zNear);
@@ -205,6 +223,21 @@ namespace ImageEvolver.Rendering.OpenGL
             _glManager.DrawElementsIndexed(BeginMode.Triangles, indexBuffer.Count, 0);
 
             vertexArray.ClearResources(true);
+        }
+    }
+
+    internal class PolygonFeatureEqualityComparator : IEqualityComparer<PolygonFeature> 
+    {
+        public bool Equals(PolygonFeature x, PolygonFeature y)
+        {
+            // we trust PolygonFeature implementation (because we know it)
+            return x.Equals(y);
+        }
+
+        public int GetHashCode(PolygonFeature obj)
+        {
+            // we trust PolygonFeature implementation
+            return obj.GetHashCode();
         }
     }
 }

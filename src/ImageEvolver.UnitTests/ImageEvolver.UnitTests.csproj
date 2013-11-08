@@ -53,7 +53,10 @@
     <Compile Include="Fitness\FitnessPerformanceTests.cs" />
     <Compile Include="Fitness\FitnessTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rendering\RendererPerformanceTests.cs" />
     <Compile Include="Rendering\RendererTests.cs" />
+    <Compile Include="Rendering\TestCandidateRandom.cs" />
+    <Compile Include="Rendering\TestCandidate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

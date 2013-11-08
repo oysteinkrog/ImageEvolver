@@ -18,42 +18,37 @@
 
 #endregion
 
+using System;
+using System.Diagnostics;
 using System.Drawing;
-using ImageEvolver.Rendering.Bitmap;
+using ImageEvolver.Core.Utilities;
 using ImageEvolver.Rendering.OpenGL;
 using NUnit.Framework;
 
 namespace ImageEvolver.UnitTests.Rendering
 {
     [TestFixture]
-    public class RendererTests
+    public class RendererPerformanceTests
     {
         [Test]
-        public void SinglePolygonTest_Bitmap()
+        public void TestOpenGLRenderingGeometryCache([Values(false, true)] bool useGeometryCache, [Values(10000)] int times)
         {
             var size = new Size(400, 400);
             using (var renderBuffer = new Bitmap(size.Width, size.Height))
             {
-                var candidate = new TestCandidate(size);
-                using (var renderer = new GenericFeaturesRendererBitmap(size))
+                using (var renderer = new GenericFeaturesRendererOpenGL(size, null, useGeometryCache))
                 {
-                    renderer.Render(candidate, renderBuffer);
-                    renderBuffer.Save(@"SinglePolygonTest_Bitmap.bmp");
-                }
-            }
-        }
-
-        [Test]
-        public void SinglePolygonTest_OpenGL()
-        {
-            var size = new Size(400, 400);
-            using (var renderBuffer = new Bitmap(size.Width, size.Height))
-            {
-                var candidate = new TestCandidate(size);
-                using (var renderer = new GenericFeaturesRendererOpenGL(size))
-                {
-                    renderer.Render(candidate, renderBuffer);
-                    renderBuffer.Save(@"SinglePolygonTest_OpenGL.bmp");
+                    var sw = new Stopwatch();
+                    for (int i = 0; i < times; i++)
+                    {
+                        var candidate = new TestCandidateRandom(size, new Range<int>(0, 10), new Range<int>(0, 10));
+                        {
+                            sw.Start();
+                            renderer.Render(candidate, renderBuffer);
+                            sw.Stop();
+                        }
+                    }
+                    Console.WriteLine(sw.Elapsed.TotalMilliseconds/times + "ms/t");
                 }
             }
         }
