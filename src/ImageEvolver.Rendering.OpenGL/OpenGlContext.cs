@@ -43,9 +43,10 @@ namespace ImageEvolver.Rendering.OpenGL
             // intialize the context, important that this is run on the correct thread
             TaskFactory.StartNew(() =>
             {
-                _window = new NativeWindow();
-
                 _graphicsMode = new GraphicsMode(32, 24, 0, 4);
+
+                _window = new NativeWindow(size.Width, size.Height, "OpenGlContext Native Window", GameWindowFlags.Default, _graphicsMode, DisplayDevice.Default);
+                
                 _graphicsContext = new GraphicsContext(GraphicsMode, Window.WindowInfo);
                 _graphicsContext.MakeCurrent(Window.WindowInfo);
                 _graphicsContext.LoadAll();
