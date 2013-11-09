@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Drawing;
 using System.Threading.Tasks;
 using ImageEvolver.Core.Utilities;
 using JetBrains.Annotations;
@@ -35,7 +36,7 @@ namespace ImageEvolver.Rendering.OpenGL
         private GraphicsMode _graphicsMode;
         private INativeWindow _window;
 
-        public OpenGlContext()
+        public OpenGlContext(Size size)
         {
             _taskFactory = new TaskFactory(new SingleThreadTaskScheduler());
 

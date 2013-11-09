@@ -162,7 +162,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
         public void TestOpenGLRenderer()
         {
             Bitmap sourceImage = Images.MonaLisa_EvoLisa200x200;
-            using (var openGlContext = new OpenGlContext())
+            using (var openGlContext = new OpenGlContext(sourceImage.Size))
             {
                 using (var renderer = new GenericFeaturesRendererOpenGL(sourceImage.Size, openGlContext))
                 {

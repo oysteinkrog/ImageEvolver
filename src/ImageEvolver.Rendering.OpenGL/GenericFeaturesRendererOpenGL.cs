@@ -54,7 +54,7 @@ namespace ImageEvolver.Rendering.OpenGL
         {
             _size = size;
             _useGeometryCache = useGeometryCache;
-            _openGlContext = new OwnedObject<IOpenGLContext>(openGLContext ?? new OpenGlContext(), openGLContext == null);
+            _openGlContext = new OwnedObject<IOpenGLContext>(openGLContext ?? new OpenGlContext(_size), openGLContext == null);
 
             // init, run on the gl thread
             _openGlContext.Value.TaskFactory.StartNew(() =>

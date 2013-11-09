@@ -28,7 +28,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
         public SimpleEvolutionSystemOpenCL(Bitmap sourceImage)
         {
             //_renderer = new GenericFeaturesRendererBitmap(sourceImage.Size);
-            var openGlContext = new OpenGlContext();
+            var openGlContext = new OpenGlContext(sourceImage.Size);
             var genericFeaturesRendererOpenGL = new GenericFeaturesRendererOpenGL(sourceImage.Size, openGlContext);
             _renderer = genericFeaturesRendererOpenGL;
             openGlContext.TaskFactory.StartNew(() =>

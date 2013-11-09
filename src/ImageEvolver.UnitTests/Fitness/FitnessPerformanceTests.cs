@@ -69,7 +69,7 @@ namespace ImageEvolver.UnitTests.Fitness
             Bitmap imageA = Images.Resize(Images.MonaLisa_EvoLisa200x200, scaleFactor);
             Bitmap imageB = Images.Resize(Images.MonaLisa_EvoLisa200x200_TestApproximation, scaleFactor);
 
-            using (var openGlContext = new OpenGlContext())
+            using (var openGlContext = new OpenGlContext(imageA.Size))
             {
                 FrameBuffer imageBFrameBuffer = null;
                 openGlContext.TaskFactory.StartNew(() =>
