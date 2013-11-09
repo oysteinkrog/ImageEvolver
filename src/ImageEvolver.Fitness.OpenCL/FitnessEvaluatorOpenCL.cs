@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Threading;
 using System.Threading.Tasks;
 using Cloo;
 using Clpp.Core;
@@ -60,7 +61,7 @@ namespace ImageEvolver.Fitness.OpenCL
         public FitnessEvaluatorOpenCL(Bitmap sourceBitmap, FrameBuffer frameBuffer, OpenGlContext openGlContext = null)
         {
             _frameBuffer = frameBuffer;
-            _openGlContext = new OwnedObject<IOpenGLContext>(openGlContext ?? new OpenGlContext(), openGlContext == null);
+            _openGlContext = new OwnedObject<IOpenGLContext>(openGlContext ?? new OpenGlContext(sourceBitmap.Size), openGlContext == null);
 
             _openGlContext.Value.TaskFactory.StartNew(() =>
             {
@@ -124,8 +125,12 @@ namespace ImageEvolver.Fitness.OpenCL
                 DisposeHelper.Dispose(ref _errorCalc);
                 DisposeHelper.Dispose(ref _sourceBitmapComputeImage);
 
-                _sourceBitmapTexture.DestroyTexture();
-                _sourceBitmapTexture = null;
+                _openGlContext.Value.TaskFactory.StartNew(() =>
+                {
+                    _sourceBitmapTexture.DestroyTexture();
+                    _sourceBitmapTexture = null;
+                })
+                              .Wait();
 
                 DisposeHelper.Dispose(ref _clppScanSum);
                 DisposeHelper.Dispose(ref _clppContext);
