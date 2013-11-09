@@ -19,10 +19,8 @@ namespace ImageEvolver.Apps.OpenGLTestApp
 {
     public class TestWindow : GameWindow
     {
-        private readonly Bitmap _bestCandidateBitmap;
         private readonly Bitmap _sourceImage;
         private BasicEngine<EvoLisaImageCandidate>.CandidateDetails _bestCandidate;
-        private Texture2D _candidateTexture;
 
         /// <summary>
         ///     The glManager takes care of opengl state changes. It is also used to bind opengl object
@@ -38,7 +36,7 @@ namespace ImageEvolver.Apps.OpenGLTestApp
 
         private Task _runEvoluationTask;
 
-        private SimpleEvolutionSystemBitmap _simpleEvolutionSystem;
+        private SimpleEvolutionSystemOpenCL _simpleEvolutionSystem;
 
 
         private RenderTechnique _technique;
@@ -47,9 +45,11 @@ namespace ImageEvolver.Apps.OpenGLTestApp
         public TestWindow() : base(800, 600)
         {
             _sourceImage = Images.MonaLisa_EvoLisa200x200;
-            _bestCandidateBitmap = new Bitmap(_sourceImage.Width, _sourceImage.Height);
+            // fixes context sharing (none of the contexts can be active when sharing is activated)
+            Context.MakeCurrent(null);
+            _simpleEvolutionSystem = new SimpleEvolutionSystemOpenCL(_sourceImage);
+            MakeCurrent();
 
-            _simpleEvolutionSystem = new SimpleEvolutionSystemBitmap(_sourceImage);
             _bestCandidate = _simpleEvolutionSystem.Engine.BestCandidate;
 
             _runEvoluationTask = Task.Factory.StartNew(() =>
@@ -88,7 +88,6 @@ namespace ImageEvolver.Apps.OpenGLTestApp
                 MessageBox.Show(_technique.ErrorMessage);
             }
 
-            _candidateTexture = new Texture2D(_sourceImage, false);
             base.OnLoad(e);
         }
 
@@ -109,7 +108,6 @@ namespace ImageEvolver.Apps.OpenGLTestApp
 
                 _perfDetails = _simpleEvolutionSystem.Engine.GetPerformanceDetails();
                 _bestCandidate = _simpleEvolutionSystem.Engine.BestCandidate;
-                _simpleEvolutionSystem.RenderToBitmap(_bestCandidate.Candidate, _bestCandidateBitmap);
 
                 Console.WriteLine("Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Rendering  {4:0.000}, Fitness {5:0.000}",
                              _simpleEvolutionSystem.Engine.Selected,
@@ -119,16 +117,8 @@ namespace ImageEvolver.Apps.OpenGLTestApp
                              _perfDetails.RelativeFitnessEvaluationTime * _perfDetails.FitnessEvaluationDetails.RelativeRenderingTime,
                              _perfDetails.RelativeFitnessEvaluationTime * _perfDetails.FitnessEvaluationDetails.RelativeFitnessEvaluationTime);
 
-                if (_candidateTexture != null)
-                {
-                    _candidateTexture.DestroyTexture();
-                    _candidateTexture = null;
-                }
-
                 // quick hack, flip bitmap... GDI and OpenGL have different origin.
-                _bestCandidateBitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-                _candidateTexture = new Texture2D(_bestCandidateBitmap, false);
-                _glManager.BindTexture(_candidateTexture, TextureUnit.Texture0);
+                _glManager.BindTexture(_simpleEvolutionSystem.RenderBuffer.PrimaryTexture, TextureUnit.Texture0);
 
                 // Use a orthographic projection
                 _glManager.Projection = _renderOptions.Ortho;
@@ -141,7 +131,7 @@ namespace ImageEvolver.Apps.OpenGLTestApp
                 ShapeDrawer.Begin(_glManager);
 
                 // We draw a quad at the top left corner with the framebuffer's texture
-                ShapeDrawer.DrawQuad(_glManager, new Vector2(0, 0), new Vector2(_candidateTexture.Width, _candidateTexture.Height)*2);
+                ShapeDrawer.DrawQuad(_glManager, new Vector2(0, 0), new Vector2(_simpleEvolutionSystem.RenderBuffer.Width, _simpleEvolutionSystem.RenderBuffer.Height));
 
                 ShapeDrawer.End(_glManager);
 

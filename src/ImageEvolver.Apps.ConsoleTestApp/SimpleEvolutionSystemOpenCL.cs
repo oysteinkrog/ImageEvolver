@@ -23,7 +23,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
         private BasicEngine<EvoLisaImageCandidate> _evolutionEngine;
         private FitnessEvaluatorOpenCL _fitnessEvalutor;
         private GenericFeaturesRendererOpenGL _renderer;
-        private FrameBuffer _renderBuffer;
+        public FrameBuffer RenderBuffer { get; private set; }
 
         public SimpleEvolutionSystemOpenCL(Bitmap sourceImage)
         {
@@ -33,8 +33,8 @@ namespace ImageEvolver.Apps.ConsoleTestApp
             _renderer = genericFeaturesRendererOpenGL;
             openGlContext.TaskFactory.StartNew(() =>
             {
-                _renderBuffer = new FrameBuffer(sourceImage.Width, sourceImage.Height, 1, false);
-                _fitnessEvalutor = new FitnessEvaluatorOpenCL(sourceImage, _renderBuffer, openGlContext);
+                RenderBuffer = new FrameBuffer(sourceImage.Width, sourceImage.Height, 1, false);
+                _fitnessEvalutor = new FitnessEvaluatorOpenCL(sourceImage, RenderBuffer, openGlContext);
             })
                          .Wait();
 
@@ -42,7 +42,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
             _basicPseudoRandomProvider = new BasicPseudoRandomProvider(0);
             _evoLisaAlgorithm = new EvoLisaAlgorithm(sourceImage, _evoLisaAlgorithmSettings, _basicPseudoRandomProvider);
             _candidateGenerator = _evoLisaAlgorithm.CreateCandidateGenerator();
-            _candidateEvaluator = new CandidateFitnessEvaluator<FrameBuffer>(_renderer, _fitnessEvalutor, _renderBuffer);
+            _candidateEvaluator = new CandidateFitnessEvaluator<FrameBuffer>(_renderer, _fitnessEvalutor, RenderBuffer);
             _evolutionEngine = new BasicEngine<EvoLisaImageCandidate>(_candidateGenerator, _candidateEvaluator);
         }
 
@@ -85,7 +85,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
 
         public void SaveBitmap(EvoLisaImageCandidate candidate, string filePath)
         {
-            using (var output = new Bitmap(_renderBuffer.Width, _renderBuffer.Height))
+            using (var output = new Bitmap(RenderBuffer.Width, RenderBuffer.Height))
             {
                 RenderToBitmap(candidate, output);
                 output.Save(filePath);
