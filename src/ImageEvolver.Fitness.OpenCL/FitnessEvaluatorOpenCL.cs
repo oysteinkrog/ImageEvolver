@@ -169,13 +169,9 @@ namespace ImageEvolver.Fitness.OpenCL
 
                 _errorCalc.ComputeDifference(_frameBufferComputeImage);
 
-                var val = new ulong[_size.Width * _size.Height];
-                _computeCommandQueue.ReadFromBuffer(_errorCalc.ErrorSquaredOutputBuffer, ref val, true, null);
-                
                 _clppScanSum.PushCLDatas(_errorCalc.ErrorSquaredOutputBuffer);
                 _clppScanSum.Scan();
 
-                _computeCommandQueue.ReadFromBuffer(_errorCalc.ErrorSquaredOutputBuffer, ref val, true, null);
                 unsafe
                 {
                     ulong lastElement = 0;
