@@ -19,6 +19,7 @@
 #endregion
 
 using System.Drawing;
+using System.Threading.Tasks;
 using ImageEvolver.Algorithms.EvoLisa;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
 using ImageEvolver.Core;
@@ -51,7 +52,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
             }
         }
 
-        private static void RunEngine(Bitmap sourceImage, EvoLisaAlgorithm evoLisaAlgorithm, IImageCandidateRenderer<IImageCandidate, Bitmap> renderer)
+        private static async Task RunEngine(Bitmap sourceImage, EvoLisaAlgorithm evoLisaAlgorithm, IImageCandidateRenderer<IImageCandidate, Bitmap> renderer)
         {
             using (var bitmapFitnessEvalutor = new FitnessEvaluatorBitmap(sourceImage, FitnessEquation.SimpleSE))
             {
@@ -65,7 +66,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                         {
                             while (evolutionEngine.Selected < 10000)
                             {
-                                if (evolutionEngine.Step())
+                                if (await evolutionEngine.StepAsync())
                                 {
                                     if (CheckEngineResults(sourceImage.Size, evolutionEngine, renderer))
                                     {
@@ -99,7 +100,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                     case 100:
                     {
                         var candidateInfo = evolutionEngine.BestCandidate;
-                        renderer.Render(candidateInfo.Candidate, renderBuffer);
+                        renderer.RenderAsync(candidateInfo.Candidate, renderBuffer);
                         renderBuffer.Save(string.Format("select_{0}_{1}.bmp",
                                                   evolutionEngine.Selected,
                                                   renderer.GetType()
@@ -110,7 +111,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                     case 800:
                     {
                         var candidateInfo = evolutionEngine.BestCandidate;
-                        renderer.Render(candidateInfo.Candidate, renderBuffer);
+                        renderer.RenderAsync(candidateInfo.Candidate, renderBuffer);
                         renderBuffer.Save(string.Format("select_{0}_{1}.bmp",
                                                   evolutionEngine.Selected,
                                                   renderer.GetType()
@@ -121,7 +122,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                     case 1150:
                     {
                         var candidateInfo = evolutionEngine.BestCandidate;
-                        renderer.Render(candidateInfo.Candidate, renderBuffer);
+                        renderer.RenderAsync(candidateInfo.Candidate, renderBuffer);
                         renderBuffer.Save(string.Format("select_{0}_{1}.bmp",
                                                   evolutionEngine.Selected,
                                                   renderer.GetType()
@@ -132,7 +133,7 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
                     case 1432:
                     {
                         var candidateInfo = evolutionEngine.BestCandidate;
-                        renderer.Render(candidateInfo.Candidate, renderBuffer);
+                        renderer.RenderAsync(candidateInfo.Candidate, renderBuffer);
                         renderBuffer.Save(string.Format("select_{0}_{1}.bmp",
                                                   evolutionEngine.Selected,
                                                   renderer.GetType()
@@ -159,12 +160,12 @@ namespace ImageEvolver.UnitTests.Algorithms.EvoLisa
         }
 
         [Test]
-        public void TestOpenGLRenderer()
+        public async Task TestOpenGLRenderer()
         {
             Bitmap sourceImage = Images.MonaLisa_EvoLisa200x200;
-            using (var openGlContext = new OpenGlContext(sourceImage.Size))
+            using (var openGlContext = await OpenGlContext.Create(sourceImage.Size))
             {
-                using (var renderer = new GenericFeaturesRendererOpenGL(sourceImage.Size, openGlContext))
+                using (var renderer = await GenericFeaturesRendererOpenGL.Create(sourceImage.Size, openGlContext))
                 {
                     using (var basicPseudoRandomProvider = new BasicPseudoRandomProvider(0))
                     {

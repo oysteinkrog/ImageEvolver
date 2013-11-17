@@ -73,7 +73,7 @@ namespace ImageEvolver.Apps.ConsoleTestApp
 
         public void RenderToBitmap(EvoLisaImageCandidate currentBestCandidate, Bitmap outputBuffer)
         {
-            _renderer.Render(currentBestCandidate, outputBuffer);
+            _renderer.RenderAsync(currentBestCandidate, outputBuffer);
         }
 
         public void SaveBitmap(EvoLisaImageCandidate candidate, string filePath)

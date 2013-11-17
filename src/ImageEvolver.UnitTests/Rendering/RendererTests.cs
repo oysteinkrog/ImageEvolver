@@ -19,6 +19,7 @@
 #endregion
 
 using System.Drawing;
+using System.Threading.Tasks;
 using ImageEvolver.Rendering.Bitmap;
 using ImageEvolver.Rendering.OpenGL;
 using NUnit.Framework;
@@ -37,22 +38,22 @@ namespace ImageEvolver.UnitTests.Rendering
                 var candidate = new TestCandidate(size);
                 using (var renderer = new GenericFeaturesRendererBitmap(size))
                 {
-                    renderer.Render(candidate, renderBuffer);
+                    renderer.RenderAsync(candidate, renderBuffer);
                     renderBuffer.Save(@"SinglePolygonTest_Bitmap.bmp");
                 }
             }
         }
 
         [Test]
-        public void SinglePolygonTest_OpenGL()
+        public async Task SinglePolygonTest_OpenGL()
         {
             var size = new Size(400, 400);
             using (var renderBuffer = new Bitmap(size.Width, size.Height))
             {
                 var candidate = new TestCandidate(size);
-                using (var renderer = new GenericFeaturesRendererOpenGL(size))
+                using (var renderer = await GenericFeaturesRendererOpenGL.Create(size))
                 {
-                    renderer.Render(candidate, renderBuffer);
+                    renderer.RenderAsync(candidate, renderBuffer);
                     renderBuffer.Save(@"SinglePolygonTest_OpenGL.bmp");
                 }
             }

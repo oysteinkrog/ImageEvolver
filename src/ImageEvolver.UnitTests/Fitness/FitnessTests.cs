@@ -20,6 +20,7 @@
 
 using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using ImageEvolver.Core.Fitness;
 using ImageEvolver.Fitness.Bitmap;
 using ImageEvolver.Fitness.OpenCL;
@@ -35,13 +36,13 @@ namespace ImageEvolver.UnitTests.Fitness
     public class FitnessTests
     {
         [Test]
-        public static void TestFitnessWithEvaluatorBitmap([Values(FitnessEquation.SimpleSE, FitnessEquation.MSE, FitnessEquation.PSNR)] FitnessEquation fitnessEquation)
+        public static async Task TestFitnessWithEvaluatorBitmap([Values(FitnessEquation.SimpleSE, FitnessEquation.MSE, FitnessEquation.PSNR)] FitnessEquation fitnessEquation)
         {
             Bitmap imageA = Images.MonaLisa_EvoLisa200x200;
             Bitmap imageB = Images.MonaLisa_EvoLisa200x200_TestApproximation;
             using (var fitnessEvaluator = new FitnessEvaluatorBitmap(imageA, fitnessEquation))
             {
-                double fitness = fitnessEvaluator.EvaluateFitness(imageB);
+                double fitness = await fitnessEvaluator.EvaluateFitnessAsync(imageB);
 
                 switch (fitnessEquation)
                 {
@@ -65,25 +66,22 @@ namespace ImageEvolver.UnitTests.Fitness
         }
 
         [Test]
-        public static void TestFitnessWithEvaluatorOpenCL()
+        public static async Task TestFitnessWithEvaluatorOpenCL()
         {
             Bitmap imageA = Images.MonaLisa_EvoLisa200x200;
             Bitmap imageB = Images.MonaLisa_EvoLisa200x200_TestApproximation;
-            using (var openGlContext = new OpenGlContext(imageA.Size))
+            using (var openGlContext = await OpenGlContext.Create(imageA.Size))
             {
                 FrameBuffer imageBFrameBuffer = null;
-                openGlContext.TaskFactory.StartNew(() =>
+                await openGlContext.TaskFactory.StartNew(() =>
                 {
                     var imageBTexture = new Texture2D(imageB, false);
-                    imageBFrameBuffer = new FrameBuffer(imageBTexture.Width,
-                                                        imageBTexture.Width,
-                                                        new Texture[] {imageBTexture},
-                                                        null);
-                })
-                             .Wait();
-                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(imageA, imageBFrameBuffer, openGlContext))
+                    imageBFrameBuffer = new FrameBuffer(imageBTexture.Width, imageBTexture.Width, new Texture[] {imageBTexture}, null);
+                });
+
+                using (var fitnessEvaluator = await FitnessEvaluatorOpenCL.Create(imageA, imageBFrameBuffer, openGlContext))
                 {
-                    double fitness = fitnessEvaluator.EvaluateFitness(imageBFrameBuffer);
+                    double fitness = await fitnessEvaluator.EvaluateFitnessAsync(imageBFrameBuffer);
                     Assert.AreEqual(46865993.0, fitness);
                 }
             }

@@ -22,26 +22,23 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Threading;
 using System.Threading.Tasks;
 using Cloo;
 using Clpp.Core;
 using Clpp.Core.Scan;
-using Clpp.Core.Utilities;
 using ImageEvolver.Core.Fitness;
 using ImageEvolver.Core.Utilities;
 using ImageEvolver.Rendering.OpenGL;
 using Koeky3D.BufferHandling;
 using Koeky3D.Textures;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using DisposeHelper = ImageEvolver.Core.Utilities.DisposeHelper;
 
 namespace ImageEvolver.Fitness.OpenCL
 {
     public sealed class FitnessEvaluatorOpenCL : IFitnessEvaluator<FrameBuffer>, IDisposable
     {
         private readonly FrameBuffer _frameBuffer;
+        private readonly ComputeImage2D _frameBufferComputeImage;
         private readonly OwnedObject<IOpenGLContext> _openGlContext;
         private ClppContext _clppContext;
 
@@ -55,62 +52,57 @@ namespace ImageEvolver.Fitness.OpenCL
         private Bitmap _sourceBitmap;
         private ComputeImage2D _sourceBitmapComputeImage;
         private Texture2D _sourceBitmapTexture;
-        private ComputeImage2D _frameBufferComputeImage;
 
-
-        public FitnessEvaluatorOpenCL(Bitmap sourceBitmap, FrameBuffer frameBuffer, OpenGlContext openGlContext = null)
+        private FitnessEvaluatorOpenCL(Bitmap sourceBitmap, FrameBuffer frameBuffer, OwnedObject<IOpenGLContext> openGlContext)
         {
+            _sourceBitmap = sourceBitmap;
             _frameBuffer = frameBuffer;
-            _openGlContext = new OwnedObject<IOpenGLContext>(openGlContext ?? new OpenGlContext(sourceBitmap.Size), openGlContext == null);
+            _openGlContext = openGlContext;
+            _size = _sourceBitmap.Size;
 
-            _openGlContext.Value.TaskFactory.StartNew(() =>
+            // TODO: get the opencl device from the opengl context..
+            // perhaps use Cloo.Bindings.CLx.GetGLContextInfoKHR()
+
+            ComputePlatform computePlatform = ComputePlatform.Platforms[0];
+            ComputeDevice device = computePlatform.Devices[0];
+
+            bool hasGlSharing = device.Extensions.Contains("cl_khr_gl_sharing");
+            if (!hasGlSharing)
             {
-                _sourceBitmap = sourceBitmap;
-                _size = _sourceBitmap.Size;
+                throw new Exception("gl sharing not supported by this device");
+            }
 
-                // TODO: get the opencl device from the opengl context..
-                // perhaps use Cloo.Bindings.CLx.GetGLContextInfoKHR()
+            _computeContext = new ComputeContext(new List<ComputeDevice>
+                                                 {
+                                                     device
+                                                 },
+                                                 OpenGLPlatformInterop.GetInteropProperties(_openGlContext.Value.GraphicsContext,
+                                                                                            computePlatform),
+                                                 null,
+                                                 IntPtr.Zero);
 
-                ComputePlatform computePlatform = ComputePlatform.Platforms[0];
-                ComputeDevice device = computePlatform.Devices[0];
+            _computeCommandQueue = new ComputeCommandQueue(_computeContext, device, ComputeCommandQueueFlags.Profiling);
 
-                bool hasGlSharing = device.Extensions.Contains("cl_khr_gl_sharing");
-                if (!hasGlSharing)
-                {
-                    throw new Exception("gl sharing not supported by this device");
-                }
+            _clppContext = new ClppContext(device, _computeContext, _computeCommandQueue);
 
-                _computeContext = new ComputeContext(new List<ComputeDevice>
-                                                     {
-                                                         device
-                                                     },
-                                                     OpenGLPlatformInterop.GetInteropProperties(_openGlContext.Value.GraphicsContext, computePlatform),
-                                                     null,
-                                                     IntPtr.Zero);
+            _clppScanSum = new ClppScanGPU<ulong>(_clppContext, _size.Width*_size.Height);
 
-                _computeCommandQueue = new ComputeCommandQueue(_computeContext, device, ComputeCommandQueueFlags.Profiling);
+            _sourceBitmapTexture = new Texture2D(_sourceBitmap, false);
+            _sourceBitmapComputeImage = ComputeImage2D.CreateFromGLTexture2D(_computeContext,
+                                                                             ComputeMemoryFlags.ReadOnly,
+                                                                             (int) _sourceBitmapTexture.TextureTarget,
+                                                                             0,
+                                                                             _sourceBitmapTexture.TextureId);
 
-                _clppContext = new ClppContext(device, _computeContext, _computeCommandQueue);
+            _frameBufferComputeImage = ComputeImage2D.CreateFromGLTexture2D(_computeContext,
+                                                                            ComputeMemoryFlags.ReadOnly,
+                                                                            (int) _frameBuffer.PrimaryTexture.TextureTarget,
+                                                                            0,
+                                                                            _frameBuffer.PrimaryTexture.TextureId);
 
-                _clppScanSum = new ClppScanGPU<ulong>(_clppContext, _size.Width*_size.Height);
-
-                _sourceBitmapTexture = new Texture2D(_sourceBitmap, false);
-                _sourceBitmapComputeImage = ComputeImage2D.CreateFromGLTexture2D(_computeContext,
-                                                                                 ComputeMemoryFlags.ReadOnly,
-                                                                                 (int) _sourceBitmapTexture.TextureTarget,
-                                                                                 0,
-                                                                                 _sourceBitmapTexture.TextureId);
-
-                _frameBufferComputeImage = ComputeImage2D.CreateFromGLTexture2D(_computeContext,
-                                                                                ComputeMemoryFlags.ReadOnly,
-                                                                                (int) _frameBuffer.PrimaryTexture.TextureTarget,
-                                                                                0,
-                                                                                _frameBuffer.PrimaryTexture.TextureId);
-
-                _errorCalc = new CalculateImageDifferenceError(_computeContext, device, _computeCommandQueue, _sourceBitmapComputeImage);
-            })
-                        .Wait();
+            _errorCalc = new CalculateImageDifferenceError(_computeContext, device, _computeCommandQueue, _sourceBitmapComputeImage);
         }
+
 
         public void Dispose()
         {
@@ -141,16 +133,27 @@ namespace ImageEvolver.Fitness.OpenCL
             // get rid of unmanaged resources
         }
 
-        public double EvaluateFitness(FrameBuffer candidate)
+        public Task<double> EvaluateFitnessAsync(FrameBuffer candidate)
         {
-            return _openGlContext.Value.TaskFactory.StartNew(() => EvaluateFitnessInternal(candidate))
-                               .Result;
+            return _openGlContext.Value.TaskFactory.StartNew(() => EvaluateFitnessInternal(candidate));
+        }
+
+        public static async Task<FitnessEvaluatorOpenCL> Create(Bitmap sourceBitmap,
+                                                                FrameBuffer frameBuffer,
+                                                                OpenGlContext openGlContext = null)
+        {
+            var openGlCotnext = new OwnedObject<IOpenGLContext>(openGlContext ?? await OpenGlContext.Create(sourceBitmap.Size),
+                                                                 openGlContext == null);
+            return
+                await openGlCotnext.Value.TaskFactory.StartNew(() => new FitnessEvaluatorOpenCL(sourceBitmap, frameBuffer, openGlCotnext));
         }
 
         private double EvaluateFitnessInternal(FrameBuffer inputFrameBuffer)
         {
             if (_frameBuffer != inputFrameBuffer)
+            {
                 throw new ArgumentException();
+            }
 
             // flush opengl operations
             GL.Flush();

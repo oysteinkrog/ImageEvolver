@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using ImageEvolver.Core;
 using ImageEvolver.Core.Mutation;
 using ImageEvolver.Features;
@@ -53,15 +54,15 @@ namespace ImageEvolver.Rendering.Bitmap
             // free native resources if there are any.
         }
 
-        public void Render(IImageCandidate candidate, System.Drawing.Bitmap bitmap)
+        public async Task RenderAsync(IImageCandidate candidate, System.Drawing.Bitmap bitmap)
         {
             using (var g = Graphics.FromImage(bitmap))
             {
-                Render(candidate, g);
+                await RenderAsync(candidate, g);
             }
         }
 
-        public void Render(IImageCandidate candidate, Graphics g)
+        public async Task RenderAsync(IImageCandidate candidate, Graphics g)
         {
             g.Clear(candidate.BackgroundColor);
 

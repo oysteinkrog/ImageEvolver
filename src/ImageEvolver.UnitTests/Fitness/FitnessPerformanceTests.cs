@@ -21,6 +21,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading.Tasks;
 using ImageEvolver.Core.Fitness;
 using ImageEvolver.Fitness.Bitmap;
 using ImageEvolver.Fitness.OpenCL;
@@ -36,7 +37,7 @@ namespace ImageEvolver.UnitTests.Fitness
     public class FitnessPerformanceTests
     {
         [Test]
-        public static void TestPerformanceBitmap([Values(FitnessEquation.AE, FitnessEquation.SimpleSE, FitnessEquation.MSE)] FitnessEquation fitnessEquation,
+        public static async Task TestPerformanceBitmap([Values(FitnessEquation.AE, FitnessEquation.SimpleSE, FitnessEquation.MSE)] FitnessEquation fitnessEquation,
                                                  [Values(100)] int times,
                                                  [Values(1.0, 20)] double scaleFactor)
         {
@@ -48,13 +49,13 @@ namespace ImageEvolver.UnitTests.Fitness
                 // warmup
                 for (int i = 0; i < 5; i++)
                 {
-                    double fitness = fitnessEvaluator.EvaluateFitness(imageB);
+                    double fitness = await fitnessEvaluator.EvaluateFitnessAsync(imageB);
                 }
 
                 sw.Start();
                 for (int i = 0; i < times; i++)
                 {
-                    double fitness = fitnessEvaluator.EvaluateFitness(imageB);
+                    double fitness = await fitnessEvaluator.EvaluateFitnessAsync(imageB);
                 }
                 sw.Stop();
             }
@@ -63,33 +64,33 @@ namespace ImageEvolver.UnitTests.Fitness
         }
 
         [Test]
-        public static void TestPerformanceOpenCL([Values(100)] int times, [Values(1.0, 20)] double scaleFactor)
+        public static async Task TestPerformanceOpenCL([Values(100)] int times, [Values(1.0, 20)] double scaleFactor)
         {
             var sw = new Stopwatch();
             Bitmap imageA = Images.Resize(Images.MonaLisa_EvoLisa200x200, scaleFactor);
             Bitmap imageB = Images.Resize(Images.MonaLisa_EvoLisa200x200_TestApproximation, scaleFactor);
 
-            using (var openGlContext = new OpenGlContext(imageA.Size))
+            using (var openGlContext = await OpenGlContext.Create(imageA.Size))
             {
                 FrameBuffer imageBFrameBuffer = null;
-                openGlContext.TaskFactory.StartNew(() =>
+                await openGlContext.TaskFactory.StartNew(() =>
                 {
                     var imageBTexture = new Texture2D(imageB, false);
                     imageBFrameBuffer = new FrameBuffer(imageBTexture.Width, imageBTexture.Width, new Texture[] {imageBTexture}, null);
-                })
-                             .Wait();
-                using (var fitnessEvaluator = new FitnessEvaluatorOpenCL(imageA, imageBFrameBuffer, openGlContext))
+                });
+
+                using (var fitnessEvaluator = await FitnessEvaluatorOpenCL.Create(imageA, imageBFrameBuffer, openGlContext))
                 {
                     // warmup
                     for (int i = 0; i < 5; i++)
                     {
-                        double fitness = fitnessEvaluator.EvaluateFitness(imageBFrameBuffer);
+                        double fitness = await fitnessEvaluator.EvaluateFitnessAsync(imageBFrameBuffer);
                     }
 
                     sw.Start();
                     for (int i = 0; i < times; i++)
                     {
-                        double fitness = fitnessEvaluator.EvaluateFitness(imageBFrameBuffer);
+                        double fitness = await fitnessEvaluator.EvaluateFitnessAsync(imageBFrameBuffer);
                     }
                     sw.Stop();
                 }

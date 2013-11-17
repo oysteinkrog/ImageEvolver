@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Drawing;
-using System.Globalization;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Clpp.Core.Utilities;
 using GLFrameWork.Shapes;
 using ImageEvolver.Algorithms.EvoLisa;
 using ImageEvolver.Apps.ConsoleTestApp;
 using ImageEvolver.Core.Engines;
-using ImageEvolver.Resources.Images;
+using ImageEvolver.Rendering.OpenGL;
 using Koeky3D;
-using Koeky3D.Textures;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -34,32 +31,28 @@ namespace ImageEvolver.Apps.OpenGLTestApp
         /// </summary>
         private RenderOptions _renderOptions;
 
-        private Task _runEvoluationTask;
-
         private SimpleEvolutionSystemOpenCL _simpleEvolutionSystem;
 
 
         private RenderTechnique _technique;
         private bool _updateRender;
 
-        public TestWindow() : base(800, 600)
+        public TestWindow(Bitmap sourceImage, SimpleEvolutionSystemOpenCL evolutionSystem, OpenGlContext openGlContext)
+            : base(
+                800,
+                600,
+                openGlContext.GraphicsMode,
+                "ImageEvolder OpenGL Test",
+                GameWindowFlags.Default,
+                DisplayDevice.Default,
+                1,
+                0,
+                GraphicsContextFlags.Default,
+                openGlContext.GraphicsContext)
         {
-            _sourceImage = Images.MonaLisa_EvoLisa200x200;
-            // fixes context sharing (none of the contexts can be active when sharing is activated)
-            Context.MakeCurrent(null);
-            _simpleEvolutionSystem = new SimpleEvolutionSystemOpenCL(_sourceImage);
-            MakeCurrent();
-
+            _sourceImage = sourceImage;
+            _simpleEvolutionSystem = evolutionSystem;
             _bestCandidate = _simpleEvolutionSystem.Engine.BestCandidate;
-
-            _runEvoluationTask = Task.Factory.StartNew(() =>
-            {
-                while (!IsExiting)
-                {
-                    _updateRender = _simpleEvolutionSystem.Engine.Step();
-                }
-            },
-                                                       TaskCreationOptions.LongRunning);
         }
 
         protected override void Dispose(bool managed)
@@ -70,6 +63,11 @@ namespace ImageEvolver.Apps.OpenGLTestApp
             }
 
             base.Dispose(managed);
+        }
+
+        public void NotifyUpdateRender()
+        {
+            _updateRender = true;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -109,15 +107,16 @@ namespace ImageEvolver.Apps.OpenGLTestApp
                 _perfDetails = _simpleEvolutionSystem.Engine.GetPerformanceDetails();
                 _bestCandidate = _simpleEvolutionSystem.Engine.BestCandidate;
 
-                Console.WriteLine("Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Rendering  {4:0.000}, Fitness {5:0.000}",
-                             _simpleEvolutionSystem.Engine.Selected,
-                             _bestCandidate.Generation,
-                             _bestCandidate.Fitness,
-                             _perfDetails.RelativeMutationTime,
-                             _perfDetails.RelativeFitnessEvaluationTime * _perfDetails.FitnessEvaluationDetails.RelativeRenderingTime,
-                             _perfDetails.RelativeFitnessEvaluationTime * _perfDetails.FitnessEvaluationDetails.RelativeFitnessEvaluationTime);
+                Console.WriteLine(
+                                  "Selected {0}, Generation {1}, BestFit {2:0.000}, Mutation {3:0.000}, Rendering  {4:0.000}, Fitness {5:0.000}",
+                                  _simpleEvolutionSystem.Engine.Selected,
+                                  _bestCandidate.Generation,
+                                  _bestCandidate.Fitness,
+                                  _perfDetails.RelativeMutationTime,
+                                  _perfDetails.RelativeFitnessEvaluationTime*_perfDetails.FitnessEvaluationDetails.RelativeRenderingTime,
+                                  _perfDetails.RelativeFitnessEvaluationTime*
+                                  _perfDetails.FitnessEvaluationDetails.RelativeFitnessEvaluationTime);
 
-                // quick hack, flip bitmap... GDI and OpenGL have different origin.
                 _glManager.BindTexture(_simpleEvolutionSystem.RenderBuffer.PrimaryTexture, TextureUnit.Texture0);
 
                 // Use a orthographic projection
@@ -131,7 +130,9 @@ namespace ImageEvolver.Apps.OpenGLTestApp
                 ShapeDrawer.Begin(_glManager);
 
                 // We draw a quad at the top left corner with the framebuffer's texture
-                ShapeDrawer.DrawQuad(_glManager, new Vector2(0, 0), new Vector2(_simpleEvolutionSystem.RenderBuffer.Width, _simpleEvolutionSystem.RenderBuffer.Height));
+                ShapeDrawer.DrawQuad(_glManager,
+                                     new Vector2(0, 0),
+                                     new Vector2(_simpleEvolutionSystem.RenderBuffer.Width, _simpleEvolutionSystem.RenderBuffer.Height));
 
                 ShapeDrawer.End(_glManager);
 
@@ -157,7 +158,8 @@ namespace ImageEvolver.Apps.OpenGLTestApp
         {
             // Set the title to show the fps
             base.Title = string.Format("Candidates/s: {0:0.00000} Generations/s: {1:0.00000}",
-                                       _simpleEvolutionSystem.Engine.Candidates/_simpleEvolutionSystem.Engine.TotalSimulationTime.TotalSeconds,
+                                       _simpleEvolutionSystem.Engine.Candidates/
+                                       _simpleEvolutionSystem.Engine.TotalSimulationTime.TotalSeconds,
                                        _bestCandidate.Generation/_simpleEvolutionSystem.Engine.TotalSimulationTime.TotalSeconds);
 
             base.OnUpdateFrame(e);

@@ -1,4 +1,5 @@
 ﻿#region Copyright
+
 //     ImageEvolver
 //     Copyright (C) 2013-2013 Øystein Krog
 // 
@@ -14,22 +15,58 @@
 // 
 //     You should have received a copy of the GNU Affero General Public License
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #endregion
 
 using System;
+using System.Drawing;
+using System.Threading;
+using System.Threading.Tasks;
+using ImageEvolver.Apps.ConsoleTestApp;
+using ImageEvolver.Resources.Images;
+using Nito.AsyncEx;
 
 namespace ImageEvolver.Apps.OpenGLTestApp
 {
-    static class Program
+    internal static class Program
     {
+        private static object _runEvoluationTask;
+
         /// <summary>
-        /// The main entry point for the application.
+        ///     The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        private static void Main()
         {
-            using (TestWindow window = new TestWindow())
+            AsyncContext.Run(() => RunSimulation());
+        }
+
+        private static async void RunSimulation()
+        {
+            Bitmap image = Images.MonaLisa_EvoLisa200x200;
+            SimpleEvolutionSystemOpenCL evolutionSystem = await SimpleEvolutionSystemOpenCL.Create(image);
+
+            // need to disable context for ogl context sharing to work
+            await evolutionSystem.OpenGlContext.Disable();
+            using (var window = new TestWindow(image, evolutionSystem, evolutionSystem.OpenGlContext))
             {
+                await evolutionSystem.OpenGlContext.Enable();
+
+                _runEvoluationTask = Task.Factory.StartNew(async () =>
+                {
+                    while (!window.IsExiting)
+                    {
+                        bool updateRender = await evolutionSystem.Engine.StepAsync();
+                        if (updateRender)
+                        {
+                            window.NotifyUpdateRender();
+                        }
+                    }
+                },
+                                                           default(CancellationToken),
+                                                           TaskCreationOptions.LongRunning,
+                                                           TaskScheduler.Default);
+
                 window.Run();
             }
         }

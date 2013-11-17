@@ -37,47 +37,42 @@ using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace ImageEvolver.Rendering.OpenGL
 {
-    public sealed class GenericFeaturesRendererOpenGL : IImageCandidateRenderer<IImageCandidate, Bitmap>, IImageCandidateRenderer<IImageCandidate, FrameBuffer>
+    public sealed class GenericFeaturesRendererOpenGL : IImageCandidateRenderer<IImageCandidate, Bitmap>,
+                                                        IImageCandidateRenderer<IImageCandidate, FrameBuffer>
     {
-        private readonly Size _size;
-        private readonly bool _useGeometryCache;
-        private GLManager _glManager;
-        private FrameBuffer _internalFrameBuffer;
-        private OwnedObject<IOpenGLContext> _openGlContext;
-        private RenderOptions _renderOptions;
-        private RenderingTechnique _technique;
-
         private readonly Dictionary<PolygonFeature, TriangleGeometryGenerator.TriangleGeometry> _geometryCache =
             new Dictionary<PolygonFeature, TriangleGeometryGenerator.TriangleGeometry>(new PolygonFeatureEqualityComparator());
 
-        public GenericFeaturesRendererOpenGL(Size size, IOpenGLContext openGLContext = null, bool useGeometryCache = false)
+        private readonly GLManager _glManager;
+        private readonly FrameBuffer _internalFrameBuffer;
+        private readonly Size _size;
+        private readonly RenderingTechnique _technique;
+        private readonly bool _useGeometryCache;
+        private OwnedObject<IOpenGLContext> _openGLContext;
+        private RenderOptions _renderOptions;
+
+        private GenericFeaturesRendererOpenGL(Size size, OwnedObject<IOpenGLContext> openGLContext, bool useGeometryCache)
         {
             _size = size;
+            _openGLContext = openGLContext;
             _useGeometryCache = useGeometryCache;
-            _openGlContext = new OwnedObject<IOpenGLContext>(openGLContext ?? new OpenGlContext(_size), openGLContext == null);
-
-            // init, run on the gl thread
-            _openGlContext.Value.TaskFactory.StartNew(() =>
+            _renderOptions = new RenderOptions(_size.Width, _size.Height, _openGLContext.Value.Window.WindowState, VSyncMode.Off);
+            _glManager = new GLManager(_renderOptions);
+            _technique = new RenderingTechnique();
+            _internalFrameBuffer = new FrameBuffer(size.Width, size.Height, 1, false);
+            if (!_technique.Initialise())
             {
-                _renderOptions = new RenderOptions(_size.Width, _size.Height, _openGlContext.Value.Window.WindowState, VSyncMode.Off);
-                _glManager = new GLManager(_renderOptions);
-                _technique = new RenderingTechnique();
-                _internalFrameBuffer = new FrameBuffer(size.Width, size.Height, 1, false);
-                if (!_technique.Initialise())
-                {
-                    throw new Exception("Technique failed to initialize");
-                }
+                throw new Exception("Technique failed to initialize");
+            }
 
-                _glManager.PushRenderState();
+            _glManager.PushRenderState();
 
-                _glManager.DepthTestEnabled = true;
-                _glManager.DepthTestFunction = DepthFunction.Less;
+            _glManager.DepthTestEnabled = true;
+            _glManager.DepthTestFunction = DepthFunction.Less;
 
-                _glManager.BlendingEnabled = true;
-                _glManager.BlendingSource = BlendingFactorSrc.SrcAlpha;
-                _glManager.BlendingDestination = BlendingFactorDest.OneMinusSrcAlpha;
-            })
-                        .Wait();
+            _glManager.BlendingEnabled = true;
+            _glManager.BlendingSource = BlendingFactorSrc.SrcAlpha;
+            _glManager.BlendingDestination = BlendingFactorDest.OneMinusSrcAlpha;
         }
 
         public void Dispose()
@@ -91,41 +86,37 @@ namespace ImageEvolver.Rendering.OpenGL
             if (disposing)
             {
                 // get rid of managed resources
-                _openGlContext.Value.TaskFactory.StartNew(() =>
+                _openGLContext.Value.TaskFactory.StartNew(() =>
                 {
                     _internalFrameBuffer.DestroyFramebuffer(false);
                 })
-                            .Wait();
+                              .Wait();
 
-                DisposeHelper.Dispose(ref _openGlContext);
+                DisposeHelper.Dispose(ref _openGLContext);
             }
             // get rid of unmanaged resources
         }
 
-        public void Render(IImageCandidate candidate, Bitmap outputBuffer)
+        public Task RenderAsync(IImageCandidate candidate, Bitmap outputBuffer)
         {
-            RenderCandidateToBitmapAsync(candidate, outputBuffer)
-                .Wait();
-        }
-
-        public void Render(IImageCandidate candidate, FrameBuffer outputBuffer)
-        {
-            RenderCandidateToTextureAsync(candidate, outputBuffer)
-                .Wait();
-        }
-
-        public Task RenderCandidateToBitmapAsync(IImageCandidate candidate, Bitmap outputBuffer)
-        {
-            return _openGlContext.Value.TaskFactory.StartNew(() =>
+            return _openGLContext.Value.TaskFactory.StartNew(() =>
             {
                 _glManager.PushFrameBuffer(_internalFrameBuffer);
 
                 RenderCandidateInternal(candidate);
 
-                BitmapData data = outputBuffer.LockBits(new Rectangle(0, 0, _size.Width, _size.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+                BitmapData data = outputBuffer.LockBits(new Rectangle(0, 0, _size.Width, _size.Height),
+                                                        ImageLockMode.WriteOnly,
+                                                        PixelFormat.Format24bppRgb);
                 try
                 {
-                    GL.ReadPixels(0, 0, _size.Width, _size.Height, OpenTK.Graphics.OpenGL.PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
+                    GL.ReadPixels(0,
+                                  0,
+                                  _size.Width,
+                                  _size.Height,
+                                  OpenTK.Graphics.OpenGL.PixelFormat.Bgr,
+                                  PixelType.UnsignedByte,
+                                  data.Scan0);
                 }
                 finally
                 {
@@ -138,9 +129,9 @@ namespace ImageEvolver.Rendering.OpenGL
             });
         }
 
-        public Task RenderCandidateToTextureAsync(IImageCandidate candidate, FrameBuffer outputBuffer)
+        public Task RenderAsync(IImageCandidate candidate, FrameBuffer outputBuffer)
         {
-            return _openGlContext.Value.TaskFactory.StartNew(() =>
+            return _openGLContext.Value.TaskFactory.StartNew(() =>
             {
                 _glManager.PushFrameBuffer(outputBuffer);
 
@@ -148,6 +139,18 @@ namespace ImageEvolver.Rendering.OpenGL
 
                 _glManager.PopFrameBuffer();
             });
+        }
+
+        public static async Task<GenericFeaturesRendererOpenGL> Create(Size size,
+                                                                       IOpenGLContext openGLContext = null,
+                                                                       bool useGeometryCache = false)
+        {
+            var ownedGlContext = new OwnedObject<IOpenGLContext>(openGLContext ?? await OpenGlContext.Create(size), openGLContext == null);
+
+            // init, run on the gl thread
+            return
+                await
+                ownedGlContext.Value.TaskFactory.StartNew(() => new GenericFeaturesRendererOpenGL(size, ownedGlContext, useGeometryCache));
         }
 
         private void RenderCandidateInternal(IImageCandidate candidate)
@@ -187,7 +190,7 @@ namespace ImageEvolver.Rendering.OpenGL
             float zIndex = zFar;
             // ATM we only know how to render PolygonFeature
             // TODO: extend this to other features
-            foreach (var feature in candidate.Features.OfType<PolygonFeature>())
+            foreach (PolygonFeature feature in candidate.Features.OfType<PolygonFeature>())
             {
                 TriangleGeometryGenerator.TriangleGeometry geometry;
                 if (_useGeometryCache)
@@ -226,7 +229,7 @@ namespace ImageEvolver.Rendering.OpenGL
         }
     }
 
-    internal class PolygonFeatureEqualityComparator : IEqualityComparer<PolygonFeature> 
+    internal class PolygonFeatureEqualityComparator : IEqualityComparer<PolygonFeature>
     {
         public bool Equals(PolygonFeature x, PolygonFeature y)
         {

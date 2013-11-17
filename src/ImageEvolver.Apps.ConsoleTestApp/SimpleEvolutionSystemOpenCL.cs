@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using Clpp.Core.Utilities;
 using ImageEvolver.Algorithms.EvoLisa;
 using ImageEvolver.Algorithms.EvoLisa.Settings;
@@ -9,7 +10,6 @@ using ImageEvolver.Core.Random;
 using ImageEvolver.Fitness.OpenCL;
 using ImageEvolver.Rendering.OpenGL;
 using Koeky3D.BufferHandling;
-using Koeky3D.Textures;
 
 namespace ImageEvolver.Apps.ConsoleTestApp
 {
@@ -23,21 +23,17 @@ namespace ImageEvolver.Apps.ConsoleTestApp
         private BasicEngine<EvoLisaImageCandidate> _evolutionEngine;
         private FitnessEvaluatorOpenCL _fitnessEvalutor;
         private GenericFeaturesRendererOpenGL _renderer;
-        public FrameBuffer RenderBuffer { get; private set; }
 
-        public SimpleEvolutionSystemOpenCL(Bitmap sourceImage)
+        private SimpleEvolutionSystemOpenCL(Bitmap sourceImage,
+                                            OpenGlContext openGlContext,
+                                            FrameBuffer renderBuffer,
+                                            FitnessEvaluatorOpenCL fitnessEvalutor,
+            GenericFeaturesRendererOpenGL renderer)
         {
-            //_renderer = new GenericFeaturesRendererBitmap(sourceImage.Size);
-            var openGlContext = new OpenGlContext(sourceImage.Size);
-            var genericFeaturesRendererOpenGL = new GenericFeaturesRendererOpenGL(sourceImage.Size, openGlContext);
-            _renderer = genericFeaturesRendererOpenGL;
-            openGlContext.TaskFactory.StartNew(() =>
-            {
-                RenderBuffer = new FrameBuffer(sourceImage.Width, sourceImage.Height, 1, false);
-                _fitnessEvalutor = new FitnessEvaluatorOpenCL(sourceImage, RenderBuffer, openGlContext);
-            })
-                         .Wait();
-
+            OpenGlContext = openGlContext;
+            RenderBuffer = renderBuffer;
+            _fitnessEvalutor = fitnessEvalutor;
+            _renderer = renderer;
             _evoLisaAlgorithmSettings = new EvoLisaAlgorithmSettings();
             _basicPseudoRandomProvider = new BasicPseudoRandomProvider(0);
             _evoLisaAlgorithm = new EvoLisaAlgorithm(sourceImage, _evoLisaAlgorithmSettings, _basicPseudoRandomProvider);
@@ -77,10 +73,25 @@ namespace ImageEvolver.Apps.ConsoleTestApp
             get { return _evolutionEngine; }
         }
 
+        public OpenGlContext OpenGlContext { get; private set; }
+        public FrameBuffer RenderBuffer { get; private set; }
+
+        public static async Task<SimpleEvolutionSystemOpenCL> Create(Bitmap sourceImage)
+        {
+            OpenGlContext openGlContext = await OpenGlContext.Create(sourceImage.Size);
+            return await await openGlContext.TaskFactory.StartNew(async () =>
+            {
+                var frameBuffer = new FrameBuffer(sourceImage.Width, sourceImage.Height, 1, false);
+                var fitnessEvalutor = await FitnessEvaluatorOpenCL.Create(sourceImage, frameBuffer, openGlContext);
+                var renderer = await GenericFeaturesRendererOpenGL.Create(sourceImage.Size, openGlContext);
+                return new SimpleEvolutionSystemOpenCL(sourceImage, openGlContext, frameBuffer, fitnessEvalutor, renderer);
+            });
+        }
+
 
         public void RenderToBitmap(EvoLisaImageCandidate currentBestCandidate, Bitmap outputBuffer)
         {
-            _renderer.Render(currentBestCandidate, outputBuffer);
+            _renderer.RenderAsync(currentBestCandidate, outputBuffer);
         }
 
         public void SaveBitmap(EvoLisaImageCandidate candidate, string filePath)

@@ -18,10 +18,12 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
 namespace ImageEvolver.Core.Fitness
 {
     public interface IFitnessEvaluator<in TCandidate>
     {
-        double EvaluateFitness(TCandidate candidate);
+        Task<double> EvaluateFitnessAsync(TCandidate candidate);
     }
 }

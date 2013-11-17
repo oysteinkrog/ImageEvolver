@@ -20,6 +20,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using ImageEvolver.Core.Fitness;
 using JetBrains.Annotations;
 
@@ -35,7 +36,6 @@ namespace ImageEvolver.Core.Engines
         private readonly Stopwatch _candidateStopwatch = new Stopwatch();
         private readonly IProfilingFitnessEvaluator<TCandidate> _fitnessEvaluator;
         private readonly Stopwatch _fitnessStopwatch = new Stopwatch();
-        private readonly object _syncRoot = new object();
         private readonly Stopwatch _totalStopwatch = new Stopwatch();
         private IRenderingFitnessEvalutionProfilingDetails _fitnessEvaluatorProfilingDetails;
 
@@ -88,58 +88,56 @@ namespace ImageEvolver.Core.Engines
         }
 
         [PublicAPI]
-        public bool Step()
+        public async Task<bool> StepAsync()
         {
-            lock (_syncRoot)
+            _totalStopwatch.Start();
+
+            try
             {
-                _totalStopwatch.Start();
+                // generate a new candidate from the single parent (no crossover/recombination)
+                CandidateDetails parentCandidateInfo = BestCandidate;
 
-                try
+                var newCandidateInfo = new CandidateDetails();
+
+                TCandidate newCandidate;
+                bool mutated = GenerateNewCandidateFromParent(parentCandidateInfo.Candidate, out newCandidate);
+                newCandidateInfo.Candidate = newCandidate;
+
+                Candidates++;
+
+                if (mutated)
                 {
-                    // generate a new candidate from the single parent (no crossover/recombination)
-                    CandidateDetails parentCandidateInfo = BestCandidate;
+                    newCandidateInfo.Generation = parentCandidateInfo.Generation + 1;
 
-                    var newCandidateInfo = new CandidateDetails();
+                    IProfilingFitnessEvaluationResult profilingFitnessEvaluationResult = await EvaluateCandidateFitnessAsync(newCandidateInfo.Candidate);
 
-                    TCandidate newCandidate;
-                    bool mutated = GenerateNewCandidateFromParent(parentCandidateInfo.Candidate, out newCandidate);
-                    newCandidateInfo.Candidate = newCandidate;
+                    _fitnessEvaluatorProfilingDetails = profilingFitnessEvaluationResult.ProfilingDetails;
+                    newCandidateInfo.Fitness = profilingFitnessEvaluationResult.Fitness;
 
-                    Candidates++;
-
-                    if (mutated)
+                    if (newCandidateInfo.Fitness <= BestCandidate.Fitness)
                     {
-                        newCandidateInfo.Generation = parentCandidateInfo.Generation + 1;
-
-                        IProfilingFitnessEvaluationResult profilingFitnessEvaluationResult = EvaluateCandidateFitness(newCandidateInfo.Candidate);
-                        _fitnessEvaluatorProfilingDetails = profilingFitnessEvaluationResult.ProfilingDetails;
-                        newCandidateInfo.Fitness = profilingFitnessEvaluationResult.Fitness;
-
-                        if (newCandidateInfo.Fitness <= BestCandidate.Fitness)
-                        {
-                            BestCandidate = newCandidateInfo;
-                            Selected++;
-                            return true;
-                        }
+                        BestCandidate = newCandidateInfo;
+                        Selected++;
+                        return true;
                     }
+                }
 
-                    return false;
-                }
-                finally
-                {
-                    _totalStopwatch.Stop();
-                    TotalSimulationTime += _totalStopwatch.Elapsed;
-                }
+                return false;
+            }
+            finally
+            {
+                _totalStopwatch.Stop();
+                TotalSimulationTime += _totalStopwatch.Elapsed;
             }
         }
 
-        private IProfilingFitnessEvaluationResult EvaluateCandidateFitness(TCandidate candidate)
+        private async Task<IProfilingFitnessEvaluationResult> EvaluateCandidateFitnessAsync(TCandidate candidate)
         {
             _fitnessStopwatch.Start();
             try
             {
                 // evaluate fitness of the new candidate
-                return _fitnessEvaluator.EvaluateFitness(candidate);
+                return await _fitnessEvaluator.EvaluateFitnessAsync(candidate);
             }
             finally
             {

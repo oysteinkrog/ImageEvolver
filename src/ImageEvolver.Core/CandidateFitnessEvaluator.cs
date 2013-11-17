@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using ImageEvolver.Core.Fitness;
 
 namespace ImageEvolver.Core
@@ -23,22 +24,22 @@ namespace ImageEvolver.Core
             _fitnessStopwatch = new Stopwatch();
         }
 
-        public double EvaluateFitness(IImageCandidate candidate)
+        public Task<double> EvaluateFitnessAsync(IImageCandidate candidate)
         {
-            _renderer.Render(candidate, _renderBuffer);
-            return _bitmapFitnessEvalutor.EvaluateFitness(_renderBuffer);
+            _renderer.RenderAsync(candidate, _renderBuffer);
+            return _bitmapFitnessEvalutor.EvaluateFitnessAsync(_renderBuffer);
         }
 
-        IProfilingFitnessEvaluationResult IProfilingFitnessEvaluator<IImageCandidate>.EvaluateFitness(IImageCandidate candidate)
+        async Task<IProfilingFitnessEvaluationResult> IProfilingFitnessEvaluator<IImageCandidate>.EvaluateFitnessAsync(IImageCandidate candidate)
         {
             _totalTimeStopwatch.Start();
 
             _renderStopwatch.Start();
-            _renderer.Render(candidate, _renderBuffer);
+            _renderer.RenderAsync(candidate, _renderBuffer);
             _renderStopwatch.Stop();
 
             _fitnessStopwatch.Start();
-            double fitness = _bitmapFitnessEvalutor.EvaluateFitness(_renderBuffer);
+            double fitness = await _bitmapFitnessEvalutor.EvaluateFitnessAsync(_renderBuffer);
             _fitnessStopwatch.Stop();
 
             _totalTimeStopwatch.Stop();

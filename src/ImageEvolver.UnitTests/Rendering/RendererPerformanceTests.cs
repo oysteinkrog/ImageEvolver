@@ -21,6 +21,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading.Tasks;
 using ImageEvolver.Core.Utilities;
 using ImageEvolver.Rendering.OpenGL;
 using NUnit.Framework;
@@ -31,12 +32,12 @@ namespace ImageEvolver.UnitTests.Rendering
     public class RendererPerformanceTests
     {
         [Test]
-        public void TestOpenGLRenderingGeometryCache([Values(false, true)] bool useGeometryCache, [Values(10000)] int times)
+        public async Task TestOpenGLRenderingGeometryCache([Values(false, true)] bool useGeometryCache, [Values(10000)] int times)
         {
             var size = new Size(400, 400);
             using (var renderBuffer = new Bitmap(size.Width, size.Height))
             {
-                using (var renderer = new GenericFeaturesRendererOpenGL(size, null, useGeometryCache))
+                using (var renderer = await GenericFeaturesRendererOpenGL.Create(size, null, useGeometryCache))
                 {
                     var sw = new Stopwatch();
                     for (int i = 0; i < times; i++)
@@ -44,7 +45,7 @@ namespace ImageEvolver.UnitTests.Rendering
                         var candidate = new TestCandidateRandom(size, new Range<int>(0, 10), new Range<int>(0, 10));
                         {
                             sw.Start();
-                            renderer.Render(candidate, renderBuffer);
+                            renderer.RenderAsync(candidate, renderBuffer);
                             sw.Stop();
                         }
                     }

@@ -30,28 +30,23 @@ namespace ImageEvolver.Rendering.OpenGL
 {
     public class OpenGlContext : IOpenGLContext
     {
+        private readonly Size _size;
         private readonly TaskFactory _taskFactory;
         private bool _disposed;
         private IGraphicsContext _graphicsContext;
-        private GraphicsMode _graphicsMode;
         private INativeWindow _window;
 
-        public OpenGlContext(Size size)
+        private OpenGlContext(Size size,
+                              TaskFactory taskFactory,
+                              GraphicsMode graphicsMode,
+                              INativeWindow window,
+                              IGraphicsContext graphicsContext)
         {
-            _taskFactory = new TaskFactory(new SingleThreadTaskScheduler());
-
-            // intialize the context, important that this is run on the correct thread
-            TaskFactory.StartNew(() =>
-            {
-                _graphicsMode = new GraphicsMode(32, 24, 0, 4);
-
-                _window = new NativeWindow(size.Width, size.Height, "OpenGlContext Native Window", GameWindowFlags.Default, _graphicsMode, DisplayDevice.Default);
-                
-                _graphicsContext = new GraphicsContext(GraphicsMode, Window.WindowInfo);
-                _graphicsContext.MakeCurrent(Window.WindowInfo);
-                _graphicsContext.LoadAll();
-            })
-                       .Wait();
+            _size = size;
+            _taskFactory = taskFactory;
+            GraphicsMode = graphicsMode;
+            _window = window;
+            _graphicsContext = graphicsContext;
         }
 
         ~OpenGlContext()
@@ -89,10 +84,7 @@ namespace ImageEvolver.Rendering.OpenGL
         }
 
         [PublicAPI]
-        public GraphicsMode GraphicsMode
-        {
-            get { return _graphicsMode; }
-        }
+        public GraphicsMode GraphicsMode { get; set; }
 
         [PublicAPI]
         public TaskFactory TaskFactory
@@ -110,6 +102,42 @@ namespace ImageEvolver.Rendering.OpenGL
         public IGraphicsContext GraphicsContext
         {
             get { return _graphicsContext; }
+            set { _graphicsContext = value; }
+        }
+
+        public static async Task<OpenGlContext> Create(Size size)
+        {
+            var taskFactory = new TaskFactory(new SingleThreadTaskScheduler());
+
+            // intialize the context, important that this is run on the correct thread
+            return await taskFactory.StartNew(() =>
+            {
+                var graphicsMode = new GraphicsMode(32, 24, 0, 4);
+
+                INativeWindow nativeWindow = new NativeWindow(size.Width,
+                                                              size.Height,
+                                                              "OpenGlContext Native Window",
+                                                              GameWindowFlags.Default,
+                                                              graphicsMode,
+                                                              DisplayDevice.Default);
+
+                IGraphicsContext graphicsContext = new GraphicsContext(graphicsMode, nativeWindow.WindowInfo);
+
+                graphicsContext.MakeCurrent(nativeWindow.WindowInfo);
+                graphicsContext.LoadAll();
+
+                return new OpenGlContext(size, taskFactory, graphicsMode, nativeWindow, graphicsContext);
+            });
+        }
+
+        public Task Disable()
+        {
+            return TaskFactory.StartNew(() => GraphicsContext.MakeCurrent(null));
+        }
+
+        public Task Enable()
+        {
+            return TaskFactory.StartNew(() => GraphicsContext.MakeCurrent(_window.WindowInfo));
         }
     }
 }

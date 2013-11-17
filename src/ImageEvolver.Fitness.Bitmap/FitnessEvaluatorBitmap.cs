@@ -21,6 +21,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Threading.Tasks;
 using ImageEvolver.Core.Fitness;
 
 namespace ImageEvolver.Fitness.Bitmap
@@ -69,7 +70,7 @@ namespace ImageEvolver.Fitness.Bitmap
             }
         }
 
-        public double EvaluateFitness(System.Drawing.Bitmap candidate)
+        public async Task<double> EvaluateFitnessAsync(System.Drawing.Bitmap candidate)
         {
             return _fitnessEquation(_sourceImagePixels, candidate);
         }

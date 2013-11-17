@@ -19,11 +19,12 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 
 namespace ImageEvolver.Core
 {
     public interface IImageCandidateRenderer<in TCandidate, in TOutputBuffer> : IDisposable where TCandidate : IImageCandidate
     {
-        void Render(TCandidate candidate, TOutputBuffer outputBuffer);
+        Task RenderAsync(TCandidate candidate, TOutputBuffer outputBuffer);
     }
 }
