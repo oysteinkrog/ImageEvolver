@@ -156,10 +156,6 @@ namespace ImageEvolver.Fitness.OpenCL
                 throw new ArgumentException();
             }
 
-            // flush opengl operations
-            GL.Flush();
-            GL.Finish();
-
             ulong fitnessErrorSum = 0;
 
             {
@@ -175,6 +171,9 @@ namespace ImageEvolver.Fitness.OpenCL
 
                 _clppScanSum.PushCLDatas(_errorCalc.ErrorSquaredOutputBuffer);
                 _clppScanSum.Scan();
+
+                // flush opencl operations
+                _computeCommandQueue.Finish();
 
                 unsafe
                 {
@@ -192,8 +191,6 @@ namespace ImageEvolver.Fitness.OpenCL
                 _computeCommandQueue.ReleaseGLObjects(computeMemories, null);
             }
 
-            // flush opencl operations
-            _computeCommandQueue.Finish();
 
             return fitnessErrorSum;
         }
