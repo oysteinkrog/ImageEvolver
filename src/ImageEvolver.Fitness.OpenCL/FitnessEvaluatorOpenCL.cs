@@ -38,7 +38,6 @@ namespace ImageEvolver.Fitness.OpenCL
     public sealed class FitnessEvaluatorOpenCL : IFitnessEvaluator<FrameBuffer>, IDisposable
     {
         private readonly FrameBuffer _frameBuffer;
-        private readonly ComputeImage2D _frameBufferComputeImage;
         private readonly OwnedObject<IOpenGLContext> _openGlContext;
         private ClppContext _clppContext;
 
@@ -48,6 +47,7 @@ namespace ImageEvolver.Fitness.OpenCL
 
         private ComputeContext _computeContext;
         private CalculateImageDifferenceError _errorCalc;
+        private ComputeImage2D _frameBufferComputeImage;
         private Size _size;
         private Bitmap _sourceBitmap;
         private ComputeImage2D _sourceBitmapComputeImage;
@@ -115,6 +115,7 @@ namespace ImageEvolver.Fitness.OpenCL
             {
                 // get rid of managed resources
                 DisposeHelper.Dispose(ref _errorCalc);
+                DisposeHelper.Dispose(ref _frameBufferComputeImage);
                 DisposeHelper.Dispose(ref _sourceBitmapComputeImage);
 
                 _openGlContext.Value.TaskFactory.StartNew(() =>
